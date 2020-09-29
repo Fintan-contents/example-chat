@@ -1,0 +1,35 @@
+.PageHeader_header {
+  height: 10vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  border-bottom: solid 1px gray;
+}
+
+.PageHeader_header a {
+  text-decoration: none;
+}
+
+.PageHeader_nav {
+  display: flex;
+  list-style: none;
+}
+
+.PageHeader_nav li {
+  margin-left: 30px;
+}
+
+.PageHeader_nav a {
+  color: black;
+}
+
+.PageHeader_nav a:hover {
+  color: var(--main-color);
+  border-bottom: solid 1px;
+}
+
+.PageHeader_logo {
+  color: black;
+  font-size: 1.5rem;
+}

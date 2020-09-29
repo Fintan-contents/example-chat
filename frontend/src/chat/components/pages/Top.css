@@ -1,0 +1,11 @@
+.Top_content {
+  text-align: center;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Top_form {
+  margin-bottom: 10vh;
+}

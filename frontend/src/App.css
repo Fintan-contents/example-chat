@@ -1,0 +1,11 @@
+:root {
+  --base-color: #FFFFFF;
+  --main-color: #3DCEE8;
+  --main-light-color: #9AF3FF;
+  --sub-color: #ACFF8B;
+}
+
+body {
+  margin: 0;
+  background-color: var(--base-color);
+}

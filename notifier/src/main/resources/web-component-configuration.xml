@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component-configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://tis.co.jp/nablarch/component-configuration"
+  xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration https://nablarch.github.io/schema/component-configuration.xsd">
+
+  <!-- 環境設定ファイル -->
+  <config-file file="common.config" />
+  <config-file file="env.config" />
+
+  <component name="redisClient" class="com.example.system.nablarch.redis.RedisClientFactory">
+    <property name="uri" value="${nablarch.lettuce.simple.uri}" />
+  </component>
+
+  <!-- ヘルスチェックエンドポイントハンドラ -->
+  <component name="healthCheck" class="nablarch.fw.web.handler.HealthCheckEndpointHandler" />
+
+  <!-- ハンドラキュー構成 -->
+  <component name="messageConsumer" class="com.example.system.nablarch.handler.HandlerQueueMessageConsumer">
+    <property name="handlerQueue">
+      <list>
+        <component class="nablarch.fw.handler.GlobalErrorHandler" />
+        <component-ref name="messageHandler" />
+      </list>
+    </property>
+  </component>
+
+  <!-- ハンドラキュー構成 -->
+  <component name="webFrontController" class="nablarch.fw.web.servlet.WebFrontController">
+    <property name="handlerQueue">
+      <list>
+        <component class="nablarch.fw.web.handler.HttpCharacterEncodingHandler"/>
+
+        <component class="nablarch.fw.handler.GlobalErrorHandler"/>
+
+        <component class="nablarch.fw.web.handler.HttpResponseHandler"/>
+
+        <!-- セキュリティ関連のレスポンスヘッダを設定するため追加 -->
+        <component class="nablarch.fw.web.handler.SecureHandler" />
+
+        <!-- ヘルスチェックエンドポイントハンドラ -->
+        <component class="nablarch.fw.RequestHandlerEntry">
+          <property name="requestPattern" value="/api/health" />
+          <property name="handler" ref="healthCheck" />
+        </component>
+
+        <component class="com.example.system.nablarch.handler.NotFoundHandler"/>
+      </list>
+    </property>
+  </component>
+
+  <!-- 初期化が必要なコンポーネント -->
+  <component name="initializer" class="nablarch.core.repository.initialization.BasicApplicationInitializer">
+    <property name="initializeList">
+      <list>
+        <component-ref name="redisSubscribingProcessor" />
+        <component-ref name="redisAuthenticationTokenRepository" />
+      </list>
+    </property>
+  </component>
+
+  <component name="disposer" class="nablarch.core.repository.disposal.BasicApplicationDisposer" >
+    <property name="disposableList">
+      <list>
+        <component-ref name="redisSubscribingProcessor" />
+        <component-ref name="redisAuthenticationTokenRepository" />
+        <component-ref name="com.example.presentation.websocket.WebSocketEndpoint" />
+      </list>
+    </property>
+  </component>
+  
+</component-configuration>

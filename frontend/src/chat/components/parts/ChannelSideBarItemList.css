@@ -1,0 +1,23 @@
+.ChannelSideBarItemList_list {
+  list-style: none;
+  padding-left: 15px;
+}
+
+.ChannelSideBarItemList_item {
+  width: 220px;
+  padding: 3px 0;
+  cursor: pointer;
+  position: relative;
+  transform: translateX(-40px);
+}
+.ChannelSideBarItemList_channelName {
+  padding: 5px;
+  word-break: break-all;
+  margin-left: 30px;
+}
+.ChannelSideBarItemList_selected {
+  background-color: var(--main-light-color);
+}
+.ChannelSideBarItemList_unread {
+  font-weight: bold;
+}

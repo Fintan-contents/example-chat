@@ -1,0 +1,36 @@
+.ChannelSideBar_sidebar {
+  background-color: var(--main-color);
+  grid-column: 1;
+  grid-row: 1 / 4;
+  overflow: auto;
+}
+
+.ChannelSideBar_sidebarList {
+  list-style: none;
+  padding-left: 25px;
+}
+
+.ChannelSideBar_plusButton {
+  position: relative;
+  top: 1px;
+  right: -55px;
+  padding-right: 20px;
+  width: 20px;
+  height: 20px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+.ChannelSideBar_plusButton:before, .ChannelSideBar_plusButton:after {
+  content: '';
+  position: absolute;
+  height: 2px;
+  width: 15px;
+  background-color: black;
+}
+.ChannelSideBar_plusButton:before {
+  transform: rotate(90deg);
+}
+.ChannelSideBar_plusButton:focus {
+  outline: none;
+}

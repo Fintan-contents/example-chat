@@ -1,0 +1,22 @@
+.NegativeButton {
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+  line-height: 1;
+  border: none;
+  font-size: 1rem;
+  color: white;
+  background-color: #e01e5a;
+  border-radius: 5px;
+  padding: 15px 30px;
+}
+.NegativeButton:hover {
+  opacity: 0.8;
+}
+.NegativeButton:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+.NegativeButton:disabled:hover {
+  background-color: gray;
+}

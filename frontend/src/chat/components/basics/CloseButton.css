@@ -1,0 +1,33 @@
+.CloseButton_wrapper {
+  position: relative;
+  width: 30px;
+  height: 30px;
+}
+
+.CloseButton {
+  display: inline;
+  text-align: center;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  border: solid 0;
+}
+.CloseButton:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.CloseButton:before, .CloseButton:after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  right: 0;
+  height: 2px;
+  width: 30px;
+  background-color: dimgray;
+}
+.CloseButton:before {
+  transform: rotate(45deg);
+}
+.CloseButton:after {
+  transform: rotate(-45deg);
+}

@@ -1,0 +1,41 @@
+.FileUploadDialog_dialog {
+  width: 400px;
+  height: 350px;
+  border: solid 0;
+  border-radius: 10px;
+}
+
+.FileUploadDialog_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ }
+
+.FileUploadDialog_header button {
+  outline: none;
+}
+
+.FileUploadDialog_title {
+  margin: 0;
+}
+
+.FileUploadDialog_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+ }
+
+.FileUploadDialog_hidden {
+  display: none;
+}
+
+.FileUploadDialog_image {
+  width: 200px;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+
+.FileUploadDialog_buttonGroup {
+  margin-top: 30px;
+}

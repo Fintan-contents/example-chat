@@ -1,0 +1,15 @@
+.TwoFactorAuthenticationSetting_content {
+  text-align: center;
+  margin-top: 5%;
+}
+
+.TwoFactorAuthenticationSetting_buttonGruop {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.TwoFactorAuthenticationSetting_buttonGruop button {
+  margin-right: 20px;
+}

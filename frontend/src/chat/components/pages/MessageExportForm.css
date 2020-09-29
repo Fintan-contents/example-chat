@@ -1,0 +1,13 @@
+.MessageExportForm_nav h2 {
+  word-break: break-all;
+  padding: 0 10%;
+}
+
+.MessageExportForm_buttonGroup {
+  float: right;
+  margin-top: 30px;
+}
+
+.MessageExportForm_buttonGroup button {
+  margin-right: 20px;
+}

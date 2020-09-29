@@ -1,0 +1,25 @@
+.ChannelLeave_nav h2 {
+  word-break: break-all;
+  padding: 0 10%;
+}
+
+.ChannelLeave_content {
+  padding: 0 25%;
+}
+.ChannelLeave_content .ValidationError {
+  text-align: center;
+}
+
+.ChannelLeave_description {
+  font-size: 16px;
+  text-align: center;
+}
+
+.ChannelLeave_buttonGroup {
+  float: right;
+  margin-top: 30px;
+}
+
+.ChannelLeave_buttonGroup button {
+  margin-right: 20px;
+}

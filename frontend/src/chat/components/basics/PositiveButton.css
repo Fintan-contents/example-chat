@@ -1,0 +1,16 @@
+.PositiveButton {
+  margin-left: auto;
+  margin-right: auto;
+  width: 190px;
+  cursor: pointer;
+  line-height: 1;
+  border: none;
+  font-size: 1rem;
+  color: black;
+  background-color: var(--sub-color);
+  border-radius: 5px;
+  padding: 15px 30px;
+}
+.PositiveButton:hover {
+  opacity: 0.8;
+}

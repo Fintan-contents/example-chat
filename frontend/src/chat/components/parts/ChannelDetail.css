@@ -1,0 +1,35 @@
+.ChannelDetail_header {
+  height: 59px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  border-bottom: 1px solid lightgray;
+}
+
+.ChannelDetail_title {
+  text-align: center;
+}
+
+.ChannelDetail_accountName {
+  margin-left: 5px;
+  word-break: break-all;
+}
+
+.ChannelDetail_subheader {
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  border-bottom: 1px solid lightgray;
+}
+
+.ChannelDetail_members {
+  list-style: none;
+}
+
+.ChannelDetail_invite {
+  margin-left: 20px;
+  margin-bottom: 30px;
+}

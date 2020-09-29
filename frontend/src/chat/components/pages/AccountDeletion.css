@@ -1,0 +1,20 @@
+.AccountDeletion_content {
+  padding: 0 25%;
+}
+.AccountDeletion_content > .ValidationError{
+  text-align: center;
+}
+
+.AccountDeletion_description {
+  font-size: 16px;
+  text-align: center;
+}
+
+.AccountDeletion_buttonGroup {
+  float: right;
+  margin-top: 10px;
+}
+
+.AccountDeletion_buttonGroup button {
+  margin-right: 20px;
+}

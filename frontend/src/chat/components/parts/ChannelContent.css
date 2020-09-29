@@ -1,0 +1,26 @@
+.ChannelContent_messageList {
+  grid-column: 2;
+  grid-row: 2 / 3;
+  overflow: auto;
+}
+.ChannelContent_paging {
+  margin-bottom: -10px;
+  text-align: center;
+}
+.ChannelContent_form {
+  grid-column: 2;
+  grid-row: 3 / 4;
+}
+
+.ChannelContent_moreReadButton {
+  border: none;
+  background-color: #FFF9A4;
+  padding: 5px 20px;
+  border-radius: 50px;
+  outline: none;
+  color: #000;
+  cursor: pointer;
+}
+.ChannelContent_moreReadButton:hover {
+  opacity: 0.9;
+}

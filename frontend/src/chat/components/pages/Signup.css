@@ -1,0 +1,12 @@
+.Signup_content {
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.Signup_form {
+  text-align: center;
+  margin-bottom: 10vh;
+}

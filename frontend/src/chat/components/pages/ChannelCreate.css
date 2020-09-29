@@ -1,0 +1,12 @@
+.ChannelCreate_content {
+  padding: 0 25%;
+}
+
+.ChannelCreate_buttonGroup {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.ChannelCreate_buttonGroup button {
+  margin-right: 20px;
+}

@@ -1,0 +1,26 @@
+
+
+.MessageList_list {
+  list-style: none;
+}
+
+.MessageList_listItem {
+  padding: 5px;
+  display: flex;
+  word-break: break-all;
+}
+
+.MessageList_userName {
+  font-weight: 700;
+  margin-right: 5px;
+}
+
+.MessageList_sendDateTime {
+  font-style: italic;
+  font-size: 14px;
+}
+
+.MessageList_img {
+  width: 100px;
+}
+

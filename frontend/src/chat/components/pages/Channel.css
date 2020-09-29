@@ -1,0 +1,26 @@
+.Channel_layout {
+  margin: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 60px 1fr 120px;
+}
+.Channel_layout a {
+  text-decoration: none;
+}
+
+.Channel_detail {
+  grid-column: 4;
+  grid-row: 1 / 4;
+  border-left: solid thin lightgray;
+  width: 250px;
+  overflow: auto;
+}
+
+.Channel_detail-shown {
+  display: block;
+}
+
+.Channel_detail-hidden {
+  display: none;
+}

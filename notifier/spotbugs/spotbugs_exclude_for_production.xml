@@ -1,0 +1,12 @@
+<FindBugsFilter>
+
+    <!-- 配列の暴露は、業務アプリでは問題にならないケースが殆んどの為チェック対象外 -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP" />
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+</FindBugsFilter>
+

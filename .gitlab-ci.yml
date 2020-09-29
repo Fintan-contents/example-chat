@@ -1,0 +1,133 @@
+stages:
+  - test
+  - integration-test
+  - build
+  - deploy
+
+test-frontend:
+  image: node:12.16.1-slim
+  stage: test
+  script:
+    - .ci/test-frontend.sh
+  artifacts:
+    reports:
+      junit: 
+        - frontend/junit.xml
+
+test-backend:
+  image: maven:3.6.3-jdk-11-slim
+  stage: test
+  script:
+    - .ci/test-backend.sh
+  artifacts:
+    reports:
+      junit: 
+        - backend/target/surefire-reports/TEST-*.xml
+
+test-notifier:
+  image: maven:3.6.3-jdk-11-slim
+  stage: test
+  script:
+    - .ci/test-notifier.sh
+  artifacts:
+    reports:
+      junit: 
+        - notifier/target/surefire-reports/TEST-*.xml
+
+integration-test-backend:
+  image: maven:3.6.3-jdk-11-slim
+  stage: integration-test
+  variables:
+    POSTGRES_PASSWORD: "example"
+    NABLARCH_DB_URL: "jdbc:postgresql://postgres:5432/postgres"
+    NABLARCH_LETTUCE_SIMPLE_URI: "redis://redis:6379"
+    MAIL_SMTP_HOST: "mail"
+    MAIL_SMTP_PORT: "1025"
+    MAIL_SMTP_USER: "user"
+    MAIL_SMTP_PASSWORD: "password"
+    AWS_S3_ENDPOINTOVERRIDE: "http://minio:9000"
+  services:
+    - name: postgres:latest
+    - name: redis:latest
+    - name: minio/minio:latest
+      alias: minio
+      command: ["--compat", "server", "/data"]
+    - name: mailhog/mailhog:latest
+      alias: mail
+  script:
+    - .ci/integration-test-backend.sh
+  artifacts:
+    reports:
+      junit: 
+        - backend/target/failsafe-reports/TEST-*.xml
+
+integration-test-notifier:
+  image: maven:3.6.3-jdk-11-slim
+  stage: integration-test
+  variables:
+    NABLARCH_LETTUCE_SIMPLE_URI: "redis://redis:6379"
+  services:
+    - name: redis:latest
+  script:
+    - .ci/integration-test-notifier.sh
+  artifacts:
+    reports:
+      junit: 
+        - notifier/target/failsafe-reports/TEST-*.xml
+
+deploy-backend:
+  image: maven:3.6.3-jdk-11-slim
+  stage: deploy
+  only:
+    refs:
+      - master
+  script:
+    - .ci/deploy-backend.sh
+
+deploy-notifier:
+  image: maven:3.6.3-jdk-11-slim
+  stage: deploy
+  only:
+    refs:
+      - master
+  script:
+    - .ci/deploy-notifier.sh
+
+build-frontend:e2e:
+  image: node:12.16.1-slim
+  stage: build
+  only:
+    refs:
+      - master
+  variables:
+    REACT_APP_BACKEND_BASE_URL: "http://example-chat-backend:8080"
+  script:
+    - .ci/build-frontend.sh
+  artifacts:
+    paths:
+      - frontend/build
+
+deploy-frontend:e2e:
+  image: docker:19.03.12
+  stage: deploy
+  only:
+    refs:
+      - master
+  services:
+    - docker:19.03.12-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - .ci/deploy-frontend.sh
+  dependencies:
+    - build-frontend:e2e
+
+cache:
+  key:
+    files:
+      - frontend/package-lock.json
+      - backend/pom.xml
+  policy: pull-push
+  paths:
+    - .npm
+    - .m2

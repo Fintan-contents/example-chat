@@ -1,0 +1,1013 @@
+openapi: 3.0.0
+info:
+  title: openapi.yml
+  version: '1.0'
+  description: チャットExampleアプリケーションAPI
+servers:
+  - url: 'http://localhost:9080/api'
+paths:
+  /signup:
+    parameters: []
+    post:
+      summary: サインアップをリクエストする
+      operationId: post-signup
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  description: ユーザー名
+                mailAddress:
+                  type: string
+                  description: メールアドレス
+                password:
+                  type: string
+                  description: パスワード
+              required:
+                - userName
+                - mailAddress
+                - password
+            examples:
+              example:
+                value:
+                  userName: hoge
+                  mailAddress: hoge@example.com
+                  password: password
+      parameters: []
+      description: ''
+  /signup/verify:
+    post:
+      summary: サインアップする
+      operationId: post-signup-verify
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '409':
+          description: Conflict
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userToken:
+                  type: string
+                  description: 検証用トークン
+              required:
+                - userToken
+            examples:
+              example:
+                value:
+                  userToken: 472ed5ff-c609-4ead-a9f2-71caeb0f22e1
+  /accounts/me:
+    get:
+      summary: アカウント情報を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: integer
+                    description: アカウントID
+                  userName:
+                    type: string
+                    description: ユーザー名
+                  mailAddress:
+                    type: string
+                    description: メールアドレス
+                required:
+                  - accountId
+              examples:
+                example:
+                  value:
+                    accountId: 1
+                    userName: user1
+                    mailAddress: user1@example.com
+        '403':
+          description: Forbidden
+      operationId: get-accouunts
+    parameters: []
+  /login:
+    post:
+      summary: ログインする
+      operationId: post-login
+      responses:
+        '200':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - COMPLETE
+                      - WAITING_2FA
+                required:
+                  - status
+              examples:
+                example:
+                  value:
+                    status: COMPLETE
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mailAddress:
+                  type: string
+                  description: メールアドレス
+                password:
+                  type: string
+                  description: パスワード
+              required:
+                - mailAddress
+                - password
+            examples:
+              example:
+                value:
+                  mailAddress: user1@example.com
+                  password: pass123-
+      parameters: []
+      description: ''
+  /logout:
+    post:
+      summary: ログアウトする
+      operationId: post-logout
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                valueForEmptyRequest:
+                  type: string
+                  description: ダミー項目
+              required:
+                - valueForEmptyRequest
+  /2fa:
+    parameters: []
+    post:
+      summary: 二要素認証を行う
+      operationId: post-2fa
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 認証コード
+              required:
+                - code
+            examples:
+              example:
+                value:
+                  code: '123456'
+      description: ''
+  /reset_password:
+    post:
+      summary: パスワードリセットを開始する
+      operationId: post-reset_password
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                mailAddress:
+                  type: string
+                  description: メールアドレス
+              required:
+                - mailAddress
+            examples:
+              example:
+                value:
+                  mailAddress: user1@example.com
+        description: ''
+  /reset_password/verify:
+    post:
+      summary: パスワードリセットの認証トークンを検証する
+      operationId: post-reset_password-verify
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 検証用トークン
+              required:
+                - token
+            examples:
+              example:
+                value:
+                  token: ebdbf091-f110-4d36-ab86-bd4466912106
+  /reset_password/new:
+    post:
+      summary: 新しいパスワードを設定する
+      operationId: post-reset_password-new
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: 検証用トークン
+                newPassword:
+                  type: string
+                  description: 新しいパスワード
+              required:
+                - token
+                - newPassword
+            examples:
+              example:
+                value:
+                  token: ebdbf091-f110-4d36-ab86-bd4466912106
+                  newPassword: password2
+  /channels:
+    get:
+      summary: チャンネル一覧を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Channel'
+              examples:
+                example:
+                  value:
+                    - id: 1
+                      name: dummy
+                      ownerId: 1
+                      type: CHANNEL
+                      allRead: false
+                    - id: 2
+                      name: chatbot
+                      ownerId: 0
+                      type: SYSTEM
+                      allRead: true
+        '403':
+          description: Forbidden
+      operationId: get-channels
+    post:
+      summary: チャンネルを作成する
+      operationId: post-channels
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelName:
+                  type: string
+                  description: チャンネル名
+              required:
+                - channelName
+            examples:
+              example:
+                value:
+                  channelName: hoge
+  '/channels/{channelId}':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    get:
+      summary: チャンネル情報を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+              examples:
+                example:
+                  value:
+                    id: 1
+                    name: dummy
+                    ownerId: 1
+                    type: CHANNEL
+                    allRead: false
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+      operationId: get-channels-channelId
+    delete:
+      summary: チャンネルを削除する
+      operationId: delete-channels-channelId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+  '/channels/{channelId}/messages':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    get:
+      summary: メッセージ一覧を取得する
+      tags: []
+      parameters:
+        - in: query
+          name: latestMessageId
+          required: false
+          schema:
+            type: integer
+          description: 最新のメッセージID
+          example: 30001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    description: メッセージ
+                    items:
+                      type: object
+                      properties:
+                        messageId:
+                          description: メッセージID
+                          type: integer
+                        channelId:
+                          description: チャンネルID
+                          type: integer
+                        accountId:
+                          description: アカウントID
+                          type: integer
+                        userName:
+                          description: ユーザ名
+                          type: string
+                        text:
+                          description: メッセージ
+                          type: string
+                  nextMessageId:
+                    type: integer
+                    description: 次のメッセージID
+                    nullable: true
+                required:
+                  - messages
+              examples:
+                example:
+                  value:
+                    - messageId: 1
+                      channelId: 1
+                      accountId: 0
+                      userName: chatbot
+                      text: '#dummyに参加しました。'
+                    - messageId: 2
+                      channelId: 1
+                      accountId: 1
+                      userName: dummy
+                      text: よろしくお願いします。
+        '403':
+          description: Forbidden
+      operationId: get-channels-channelId-messages
+    post:
+      summary: メッセージを投稿する
+      operationId: post-channels-channelId-messages
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: メッセージ
+              required:
+                - text
+            examples:
+              example:
+                value:
+                  text: よろしくお願いします
+  '/channels/{channelId}/files':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    post:
+      summary: ファイルを投稿する
+      operationId: post-channels-channelId-files
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: ''
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+              required:
+                - image
+        description: ''
+  '/channels/{channelId}/members':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    get:
+      summary: メンバー一覧を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: アカウントID
+                    name:
+                      type: string
+                      description: ユーザー名
+                    isOwner:
+                      type: boolean
+                      description: 所有チャンネル
+                  required:
+                    - id
+                    - name
+                    - isOwner
+              examples:
+                example:
+                  value:
+                    - id: 1
+                      name: dummy
+                      isOwner: true
+                    - id: 5
+                      name: hoge
+                      isOwner: false
+        '403':
+          description: Forbidden
+      operationId: get-channels-channelId-members
+    post:
+      summary: メンバーに追加する
+      operationId: post-channels-channelId-members
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountId:
+                  type: integer
+                  description: アカウントID
+              required:
+                - accountId
+            examples:
+              example-1:
+                value:
+                  accountId: 10010
+  '/channels/{channelId}/members/me':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    delete:
+      summary: チャンネルから退出する
+      operationId: delete-channels-channelId-members-me
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+  '/channels/{channelId}/settings/name':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    put:
+      summary: チャンネルの名前を変更する
+      operationId: put-channels-channelId-settings-name
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channelName:
+                  type: string
+                  description: チャンネル名
+              required:
+                - channelName
+            examples:
+              example:
+                value:
+                  channelName: fuga
+  '/channels/{channelId}/invitable_accounts':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    get:
+      summary: チャンネルに招待可能なアカウント一覧を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: アカウントID
+                    name:
+                      type: string
+                      description: ユーザー名
+                  required:
+                    - id
+                    - name
+              examples:
+                example:
+                  value:
+                    - id: 10
+                      name: user1
+                    - id: 20
+                      name: user2
+        '403':
+          description: Forbidden
+      operationId: get-channels-channelId-invitable_members
+  '/read/{channelId}':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    put:
+      summary: メッセージを既読にする
+      operationId: put-read-channelId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messageId:
+                  type: integer
+                  description: メッセージID
+              required:
+                - messageId
+            examples:
+              example:
+                value:
+                  messageId: 30001
+        description: ''
+  /settings/password:
+    put:
+      summary: アカウントのパスワードを変更する
+      operationId: put-settings-password
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  format: password
+                  description: 現在のパスワード
+                newPassword:
+                  type: string
+                  format: password
+                  description: 新しいパスワード
+              required:
+                - password
+                - newPassword
+            examples:
+              example:
+                value:
+                  password: password
+                  newPassword: password2
+  /settings/2fa:
+    get:
+      summary: アカウントの二要素認証設定を取得する
+      operationId: get-settings-2fa
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ENABLED
+                      - DISABLED
+                    description: 2FA認証の設定有無
+              examples:
+                example:
+                  value:
+                    status: DISABLED
+        '403':
+          description: Forbidden
+      parameters: []
+  /settings/2fa/enable:
+    post:
+      summary: 二要素認証設定の有効化手続きを開始する
+      operationId: post-settings-2fa-enable
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secretString:
+                    type: string
+                    description: 秘密鍵
+              examples:
+                example:
+                  value:
+                    secretString: YECBDPTDBOIG2UJOCIADCSL6FIUK4CUY
+        '403':
+          description: Forbidden
+  /settings/2fa/enable/verify:
+    post:
+      summary: 二要素認証設定を有効にする
+      operationId: post-settings-2fa-enable-verify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 認証コード
+              required:
+                - code
+            examples:
+              example:
+                value:
+                  code: '123456'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /settings/2fa/disable:
+    post:
+      summary: 二要素認証設定を無効にする
+      operationId: post-settings-2fa-disable
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+      description: ''
+      parameters: []
+  /systeminfo/notification:
+    get:
+      summary: 通知設定情報を取得する
+      tags: []
+      operationId: get-systeminfo-notification
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  websocketUri:
+                    type: string
+                    description: WebSocket URI
+                required:
+                  - websocketUri
+              examples:
+                example:
+                  value:
+                    websocketUri: 'ws://localhost:9080/websocket/chat'
+        '403':
+          description: Forbidden
+  /systeminfo/messages:
+    get:
+      summary: メッセージ一覧を取得する
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: メッセージIDをキーとしたメッセージ一覧
+                additionalProperties:
+                  type: string
+              examples:
+                example:
+                  value:
+                    label.welcome: Welcome
+                    validation.upload.notAllowFileExtension: 'アップロードできるファイルの拡張子は「jpg, jpeg, png, gif」のみです。'
+                    validation.upload.fileUnread: ファイルが壊れているため、読み取ることができません。
+        '403':
+          description: Forbidden
+      operationId: get-systeminfo-messages
+  /accounts/me/delete:
+    post:
+      summary: アカウントを削除する
+      operationId: delete-accounts-me-delete
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: パスワード
+              required:
+                - password
+            examples:
+              example:
+                value:
+                  password: 'password'
+  '/channels/{channelId}/history/archive':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+    post:
+      summary: メッセージ履歴ファイルをエクスポートする
+      operationId: post-channels-channelId-history-archive
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileKey:
+                    type: string
+                    description: ファイル名
+              examples:
+                example:
+                  value:
+                    secretString: filename
+        '403':
+          description: Forbidden
+  '/channels/{channelId}/history/archive/{filekey}':
+    parameters:
+      - in: path
+        schema:
+          type: string
+        example: '20001'
+        name: channelId
+        required: true
+        description: チャンネルID
+      - in: path
+        name: filekey
+        required: true
+        schema:
+          type: string
+        description: ファイル名
+        example: filename
+    get:
+      summary: メッセージ履歴ファイルをダウンロードする
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Forbidden
+      operationId: get-channels-channelId-history-archive
+components:
+  schemas:
+    Channel:
+      title: Channel
+      type: object
+      description: チャンネル情報
+      properties:
+        id:
+          type: integer
+          description: チャンネルID
+        name:
+          type: string
+          description: チャンネル名
+        ownerId:
+          type: integer
+          description: オーナーアカウントID
+        type:
+          type: string
+          description: チャンネル種別
+          enum:
+            - CHANNEL
+            - SYSTEM
+        allRead:
+          description: 全メッセージ既読
+          type: boolean
+      required:
+        - id
+        - name
+        - ownerId
+        - type
+        - allRead
+  parameters:
+    channelIdPath:
+      in: path
+      schema:
+        type: string
+      example: '20001'
+      name: channelId
+      required: true
+      description: チャンネルID
+  securitySchemes: {}

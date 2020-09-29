@@ -1,0 +1,41 @@
+.MessageForm_form {
+  display: flex;
+  flex-wrap: wrap;
+  border: solid 1px;
+  border-radius: 5px;
+  margin: 20px;
+}
+
+.MessageForm_input {
+  height: 40px;
+  padding: 0 5px;
+  border: solid 0;
+  border-radius: 5px;
+  flex: 100%;
+  outline: none;
+}
+
+.MessageForm_sendButton {
+  height: 40px;
+  padding: 0px 20px;
+  background-color: #31b3c7;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 0 0 0 4px;
+}
+.MessageForm_sendButton:hover {
+  opacity: 0.9;
+}
+
+.MessageForm_fileButton {
+  height: 40px;
+  padding: 0px 20px;
+  background-color: lightslategray;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+.MessageForm_fileButton:hover {
+  opacity: 0.9;
+}

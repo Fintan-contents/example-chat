@@ -1,0 +1,38 @@
+.ChannelSettings_nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ChannelSettings_nav h2 {
+  word-break: break-all;
+  padding: 0 10%;
+}
+
+.ChannelSettings_close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.ChannelSettings_list {
+  padding: 0 25%;
+  list-style: none;
+}
+
+.ChannelSettings_item {
+  min-height: 120px;
+  padding: 20px 30px;
+  border-top: 1px solid lightgray;
+  cursor: pointer;
+}
+.ChannelSettings_item a {
+  text-decoration: none;
+  color: black;
+}
+.ChannelSettings_item:hover {
+  opacity: 0.8;
+}
+
+.ChannelSettings_itemTitle {
+  margin: 0 0 10px;
+}
