@@ -1,0 +1,11 @@
+# backend 用デプロイ設定
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: <TASK_DEFINITION>
+        LoadBalancerInfo:
+          ContainerName: "epona-chat-example-backend-task"
+          ContainerPort: 80
+        PlatformVersion: "1.4.0"

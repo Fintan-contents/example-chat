@@ -1,0 +1,112 @@
+
+{
+  "ipcMode": null,
+  "taskRoleArn": "arn:aws:iam::232105380006:role/EponaNotifierContainerServiceTaskRole",
+  "executionRoleArn": "arn:aws:iam::232105380006:role/EponaNotifierContainerServiceTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "essential": true,
+      "image": "906394416424.dkr.ecr.ap-northeast-1.amazonaws.com/aws-for-fluent-bit:2.9.0",
+      "name": "log_router",
+      "firelensConfiguration": {
+        "type": "fluentbit"
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/epona/fargate/epona-chat-example-notifier/fluent-bit",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "notifier"
+        }
+      },
+      "memoryReservation": 50
+    },
+    {
+      "name": "epona-chat-example-notifier-task",
+      "image": "<IMAGE2_NAME>",
+      "essential": true,
+      "portMappings": [
+        {
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awsfirelens",
+        "options": {
+          "Name": "cloudwatch",
+          "region": "ap-northeast-1",
+          "log_group_name": "/epona/fargate/epona-chat-example-notifier/reverse-proxy",
+          "auto_create_group": "false",
+          "log_stream_prefix": "from-fluent-bit/"
+        }
+      }
+    },
+    {
+      "name": "epona-app-task",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "portMappings": [
+        {
+          "protocol": "tcp",
+          "containerPort": 8080
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awsfirelens",
+        "options": {
+          "Name": "cloudwatch",
+          "region": "ap-northeast-1",
+          "log_group_name": "/epona/fargate/epona-chat-example-notifier/chat-example-notifier",
+          "auto_create_group": "false",
+          "log_stream_prefix": "from-fluent-bit/"
+        }
+      },
+      "secrets": [
+        {
+          "name": "NABLARCH_LETTUCE_SIMPLE_URI",
+          "valueFrom": "/Epona/App/Config/nablarch_lettuce_simple_url"
+        }
+      ]
+    },
+    {
+      "name": "datadog-agent-notifier",
+      "image": "datadog/agent:latest",
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awsfirelens",
+        "options": {
+          "Name": "cloudwatch",
+          "region": "ap-northeast-1",
+          "log_group_name": "/epona/fargate/epona-chat-example-notifier/datadog-agent",
+          "auto_create_group": "false",
+          "log_stream_prefix": "from-fluent-bit/"
+        }
+      },
+      "memoryReservation": 256,
+      "cpu": 10,
+      "environment": [
+        {
+          "name": "ECS_FARGATE",
+          "value": "true"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DD_API_KEY",
+          "valueFrom": "/Epona/Infra/Config/SaaS/Datadog/datadog_api_key"
+        }
+      ]
+    }
+  ],
+  "compatibilities": [
+    "FARGATE"
+  ],
+  "family": "epona-chat-example-notifier-task",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "networkMode": "awsvpc",
+  "cpu": "512",
+  "memory": "1024"
+}

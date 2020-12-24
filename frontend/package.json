@@ -71,5 +71,8 @@
   "devDependencies": {
     "@types/react-router-dom": "^5.1.3",
     "jest-junit": "^10.0.0"
+  },
+  "jest": {
+    "globalSetup": "./setup.js"
   }
 }

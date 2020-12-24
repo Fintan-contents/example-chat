@@ -1,11 +1,21 @@
 package com.example.system.nablarch.jaxrs;
 
+import com.example.system.nablarch.web.RestApiErrorResponseBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import nablarch.core.log.Logger;
+import nablarch.core.log.LoggerManager;
+import nablarch.fw.web.HttpErrorResponse;
+import nablarch.fw.web.HttpResponse;
 import nablarch.integration.jaxrs.jackson.Jackson2BodyConverter;
 
+import java.io.IOException;
+import java.io.Reader;
+
 public class BodyConverter extends Jackson2BodyConverter {
+
+    private static final Logger LOGGER = LoggerManager.get(BodyConverter.class);
 
     @Override
     protected void configure(ObjectMapper objectMapper) {
@@ -14,5 +24,16 @@ public class BodyConverter extends Jackson2BodyConverter {
         // Date and Time APIをJacksonで変換するための設定
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.registerModule(new JavaTimeModule());
+    }
+
+    @Override
+    protected Object readValue(Reader src, Class<?> valueType) {
+        try {
+            return super.readValue(src, valueType);
+        } catch (IOException e) {
+            LOGGER.logInfo("failed to read request. cause = [" + e.getMessage() + ']');
+            throw new HttpErrorResponse(RestApiErrorResponseBuilder.build(
+                    HttpResponse.Status.BAD_REQUEST, "request"), e);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.presentation.restapi.account;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -19,10 +20,9 @@ public class MyAccountDeletionActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/accounts/me/delete")
                 .setContentType("application/json")
                 .setBody(Map.of("password", password));
-
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("delete-accounts-me-delete", request, response);
     }
 
@@ -34,8 +34,8 @@ public class MyAccountDeletionActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/accounts/me/delete")
                 .setContentType("application/json")
                 .setBody(Map.of("password", password));
-
         HttpResponse response = sendRequest(request);
+
         assertEquals(204, response.getStatusCode());
     }
 
@@ -48,21 +48,26 @@ public class MyAccountDeletionActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/accounts/me/delete")
                 .setContentType("application/json")
                 .setBody(Map.of("password", mistakePassword));
-
         HttpResponse response = sendRequest(request);
-        assertEquals(401, response.getStatusCode());
 
+        assertEquals(401, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "authentication.failed");
         validateByOpenAPI("delete-accounts-me-delete", request, response);
     }
 
     @Test
     public void ログインしていない場合はアカウントを削除できない() {
         loadCsrfToken();
+
         RestMockHttpRequest request = post("/api/accounts/me/delete")
                 .setContentType("application/json")
                 .setBody(Map.of("password", "pass123-"));
-
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("delete-accounts-me-delete", request, response);
     }
 }

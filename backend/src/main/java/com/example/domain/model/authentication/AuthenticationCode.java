@@ -6,12 +6,10 @@ public class AuthenticationCode {
 
     private final String value;
 
-    private final static int MAX_LENGTH = 6;
-
     public AuthenticationCode(String value) {
+        // コード値はアルゴリズム依存でシステム保持もしないため、コード値についてはチェックしない
         Objects.requireNonNull(value);
         validateNotBlank(value);
-        validateLength(value);
 
         this.value = value;
     }
@@ -28,11 +26,5 @@ public class AuthenticationCode {
 
     public boolean isMatch(AuthenticationCode authenticationCode) {
         return this.value.equals(authenticationCode.value);
-    }
-
-    private static void validateLength(String value) {
-        if (value.length() > MAX_LENGTH) {
-            throw new IllegalArgumentException(String.format("AuthenticationCode length is too long. value=[%s]", value));
-        }
     }
 }

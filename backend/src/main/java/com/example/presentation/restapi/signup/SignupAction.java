@@ -8,7 +8,6 @@ import com.example.domain.model.account.UserName;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 import nablarch.core.validation.ee.ValidatorUtil;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

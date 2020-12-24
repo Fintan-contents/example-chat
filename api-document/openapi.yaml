@@ -15,7 +15,9 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
       requestBody:
         content:
           application/json:
@@ -51,11 +53,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '404':
-          description: Not Found
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Conflict
+          $ref: '#/components/responses/Conflict'
       requestBody:
         content:
           application/json:
@@ -101,7 +103,7 @@ paths:
                     userName: user1
                     mailAddress: user1@example.com
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       operationId: get-accouunts
     parameters: []
   /login:
@@ -128,9 +130,9 @@ paths:
                   value:
                     status: COMPLETE
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
       requestBody:
         content:
           application/json:
@@ -161,21 +163,10 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       description: ''
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                valueForEmptyRequest:
-                  type: string
-                  description: ダミー項目
-              required:
-                - valueForEmptyRequest
   /2fa:
     parameters: []
     post:
@@ -185,9 +176,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
       requestBody:
         content:
           application/json:
@@ -212,7 +205,7 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
       requestBody:
         content:
           application/json:
@@ -238,9 +231,9 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '404':
-          description: Not Found
+          $ref: '#/components/responses/NotFound'
       requestBody:
         content:
           application/json:
@@ -264,9 +257,10 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '404':
           description: Not Found
+          $ref: '#/components/responses/NotFound'
       requestBody:
         content:
           application/json:
@@ -305,16 +299,14 @@ paths:
                   value:
                     - id: 1
                       name: dummy
-                      ownerId: 1
                       type: CHANNEL
                       allRead: false
                     - id: 2
                       name: chatbot
-                      ownerId: 0
                       type: SYSTEM
                       allRead: true
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       operationId: get-channels
     post:
       summary: チャンネルを作成する
@@ -323,11 +315,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict
+          $ref: '#/components/responses/Conflict'
       requestBody:
         content:
           application/json:
@@ -367,13 +359,12 @@ paths:
                   value:
                     id: 1
                     name: dummy
-                    ownerId: 1
                     type: CHANNEL
                     allRead: false
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: Not Found
+          $ref: '#/components/responses/NotFound'
       operationId: get-channels-channelId
     delete:
       summary: チャンネルを削除する
@@ -382,9 +373,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/channels/{channelId}/messages':
     parameters:
       - in: path
@@ -454,7 +447,9 @@ paths:
                       userName: dummy
                       text: よろしくお願いします。
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       operationId: get-channels-channelId-messages
     post:
       summary: メッセージを投稿する
@@ -463,9 +458,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       requestBody:
         content:
           application/json:
@@ -497,9 +494,13 @@ paths:
         '204':
           description: No Content
         '400':
-          description: ''
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
       requestBody:
         content:
           multipart/form-data:
@@ -557,7 +558,9 @@ paths:
                       name: hoge
                       isOwner: false
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       operationId: get-channels-channelId-members
     post:
       summary: メンバーに追加する
@@ -566,9 +569,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       requestBody:
         content:
           application/json:
@@ -600,9 +605,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/channels/{channelId}/settings/name':
     parameters:
       - in: path
@@ -619,11 +626,13 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '409':
-          description: Conflict
+          $ref: '#/components/responses/Conflict'
       description: ''
       requestBody:
         content:
@@ -679,7 +688,9 @@ paths:
                     - id: 20
                       name: user2
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       operationId: get-channels-channelId-invitable_members
   '/read/{channelId}':
     parameters:
@@ -697,9 +708,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       requestBody:
         content:
           application/json:
@@ -724,11 +737,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       requestBody:
         content:
           application/json:
@@ -774,7 +787,7 @@ paths:
                   value:
                     status: DISABLED
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       parameters: []
   /settings/2fa/enable:
     post:
@@ -795,8 +808,10 @@ paths:
                 example:
                   value:
                     secretString: YECBDPTDBOIG2UJOCIADCSL6FIUK4CUY
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
   /settings/2fa/enable/verify:
     post:
       summary: 二要素認証設定を有効にする
@@ -820,11 +835,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
   /settings/2fa/disable:
     post:
       summary: 二要素認証設定を無効にする
@@ -832,12 +847,14 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       description: ''
       parameters: []
   /systeminfo/notification:
-    get:
+    post:
       summary: 通知設定情報を取得する
       tags: []
       operationId: get-systeminfo-notification
@@ -851,15 +868,15 @@ paths:
                 properties:
                   websocketUri:
                     type: string
-                    description: WebSocket URI
+                    description: 認証用トークンを含んだWebSocket URI
                 required:
                   - websocketUri
               examples:
                 example:
                   value:
-                    websocketUri: 'ws://localhost:9080/websocket/chat'
+                    websocketUri: 'ws://localhost:9080/websocket/chat?token=xxxxxx'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
   /systeminfo/messages:
     get:
       summary: メッセージ一覧を取得する
@@ -880,8 +897,8 @@ paths:
                     label.welcome: Welcome
                     validation.upload.notAllowFileExtension: 'アップロードできるファイルの拡張子は「jpg, jpeg, png, gif」のみです。'
                     validation.upload.fileUnread: ファイルが壊れているため、読み取ることができません。
-        '403':
-          description: Forbidden
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
       operationId: get-systeminfo-messages
   /accounts/me/delete:
     post:
@@ -891,11 +908,11 @@ paths:
         '204':
           description: No Content
         '400':
-          description: Bad Request
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
       requestBody:
         content:
           application/json:
@@ -939,7 +956,9 @@ paths:
                   value:
                     secretString: filename
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   '/channels/{channelId}/history/archive/{filekey}':
     parameters:
       - in: path
@@ -967,10 +986,57 @@ paths:
               schema:
                 type: string
                 format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '403':
-          description: Forbidden
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
       operationId: get-channels-channelId-history-archive
 components:
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PayloadTooLarge:
+      description: Payload Too Large
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     Channel:
       title: Channel
@@ -983,9 +1049,6 @@ components:
         name:
           type: string
           description: チャンネル名
-        ownerId:
-          type: integer
-          description: オーナーアカウントID
         type:
           type: string
           description: チャンネル種別
@@ -998,9 +1061,22 @@ components:
       required:
         - id
         - name
-        - ownerId
         - type
         - allRead
+    Error:
+      title: Error
+      type: object
+      description: エラーレスポンス
+      properties:
+        code:
+          type: string
+          description: エラーコード
+        message:
+          type: string
+          description: エラーメッセージ
+      required:
+        - code
+        - message
   parameters:
     channelIdPath:
       in: path

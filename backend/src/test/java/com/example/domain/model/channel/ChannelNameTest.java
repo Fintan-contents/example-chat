@@ -17,7 +17,7 @@ public class ChannelNameTest {
     @ValueSource(strings = { "testchannel" })
     @MethodSource("justMaxlength")
     void validWith(String value) {
-        new ChannelName(value);
+        assertDoesNotThrow(() -> new ChannelName(value));
     }
 
     @Test
@@ -34,7 +34,8 @@ public class ChannelNameTest {
 
     static Stream<String> justMaxlength() {
         String text = IntStream.range(0, 50).mapToObj(i -> "x").collect(Collectors.joining());
-        return Stream.of(text);
+        String surrogatePair = IntStream.range(0, 49).mapToObj(i -> "x").collect(Collectors.joining()) + "𩸽";
+        return Stream.of(text, surrogatePair);
     }
 
     static Stream<String> overMaxlength() {

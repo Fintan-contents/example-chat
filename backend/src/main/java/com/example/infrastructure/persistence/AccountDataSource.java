@@ -68,8 +68,23 @@ public class AccountDataSource implements AccountRepository {
     }
 
     @Override
+    public boolean existsBy(AccountId accountId) {
+        try {
+            UniversalDao.findById(AccountEntity.class, accountId.value());
+            return true;
+        } catch (NoDataException e) {
+            return false;
+        }
+    }
+
+    @Override
     public boolean existsBy(UserName userName) {
         return UniversalDao.exists(AccountEntity.class, "SELECT_FOR_EXISTS", Map.of("userName", userName.value()));
+    }
+
+    @Override
+    public boolean existsBy(MailAddress mailAddress) {
+        return UniversalDao.exists(AccountEntity.class, "SELECT_BY_MAIL_ADDRESS", Map.of("mailAddress", mailAddress.value()));
     }
 
     private Account toAccount(AccountEntity accountEntity) {

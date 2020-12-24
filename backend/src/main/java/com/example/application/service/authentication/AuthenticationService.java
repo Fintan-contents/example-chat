@@ -6,7 +6,7 @@ import com.example.domain.model.authentication.AuthenticationStatus;
 import com.example.domain.repository.AccountPasswordRepository;
 import com.example.presentation.restapi.LoginContext;
 import com.example.domain.repository.AccountRepository;
-import com.example.application.MismatchedCredentialException;
+import com.example.application.AuthenticationException;
 import com.example.application.service.account.PasswordHashingProcessor;
 import com.example.domain.repository.TwoFactorAuthenticationSettingRepository;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
@@ -41,11 +41,11 @@ public class AuthenticationService {
     public AuthenticationStatus authenticate(LoginContext context, MailAddress mailAddress, RawPassword password) {
         Account account = accountRepository.findBy(mailAddress);
         if (account == null) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
         AccountPassword accountPassword = passwordRepository.findById(account.accountId());
         if (!passwordHashingProcessor.matches(accountPassword.password(), password)) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
 
         TwoFactorAuthenticationSetting twoFactorAuthenticationSetting = twoFactorAuthenticationSettingRepository
@@ -62,13 +62,13 @@ public class AuthenticationService {
     public void verifyAuthenticationCode(LoginContext loginContext, AuthenticationCode code) {
         AccountId accountId = loginContext.getAccountIdWaiting2fa();
         if (accountId == null) {
-            throw new AuthorizationException();
+            throw new CredentialNotFoundException();
         }
         TwoFactorAuthenticationSetting setting = twoFactorAuthenticationSettingRepository.findById(accountId);
 
         AuthenticationCode generatedCode = authenticationCodeGenerator.generate(setting.secretKey());
         if (!generatedCode.isMatch(code)) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
 
         loginContext.login(accountId);
@@ -93,13 +93,13 @@ public class AuthenticationService {
         byte[] secretKeyValue = SessionUtil.orNull(context, WAITING_2FA_ACTIVATION);
         if (secretKeyValue == null) {
             // セッションが切れて取得できなかった場合も同様のエラーとして扱っておく
-            throw new AuthorizationException();
+            throw new CredentialNotFoundException();
         }
         SecretKey secretKey = new SecretKey(secretKeyValue);
 
         AuthenticationCode generatedCode = authenticationCodeGenerator.generate(secretKey);
         if (!code.isMatch(generatedCode)) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
 
         TwoFactorAuthenticationSetting currentSetting = twoFactorAuthenticationSettingRepository.findById(accountId);

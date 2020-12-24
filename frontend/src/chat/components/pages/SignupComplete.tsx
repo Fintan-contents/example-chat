@@ -22,6 +22,9 @@ const SignupComplete: React.FC = () => {
         if (response === 'conflict') {
           setMessage('既に同じユーザー名が登録されています。再度サインアップしてください。');
         }
+        if (response === 'invalid') {
+          setMessage('無効なトークンです。再度サインアップしてください。');
+        }
       })
       .finally(() => setIsLoaded(true));
   }, [token]);

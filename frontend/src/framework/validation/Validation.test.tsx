@@ -150,6 +150,82 @@ describe('useValidation', () => {
     expect(str).toHaveTextContent('long');
   });
 
+  test('サロゲートペア文字を1文字でカウントできる', () => {
+
+    const value: Field = {
+      str: '12345𩸽',
+      num: '100',
+      email: '',
+      array: ['test'],
+      custom: '',
+    };
+    const component = render(
+      <Validation {...value} />
+    );
+
+    fireEvent.click(component.getByTestId('validate'));
+
+    const str = component.container.querySelector('#str');
+    expect(str).toHaveTextContent('OK');
+  });
+
+  test('絵文字を1文字でカウントできる', () => {
+
+    const value: Field = {
+      str: '12345😭',
+      num: '100',
+      email: '',
+      array: ['test'],
+      custom: '',
+    };
+    const component = render(
+      <Validation {...value} />
+    );
+
+    fireEvent.click(component.getByTestId('validate'));
+
+    const str = component.container.querySelector('#str');
+    expect(str).toHaveTextContent('OK');
+  });
+
+  test('結合文字は1文字としてカウントしない', () => {
+
+    const value: Field = {
+      str: '12345ǖ',
+      num: '100',
+      email: '',
+      array: ['test'],
+      custom: '',
+    };
+    const component = render(
+      <Validation {...value} />
+    );
+
+    fireEvent.click(component.getByTestId('validate'));
+
+    const str = component.container.querySelector('#str');
+    expect(str).toHaveTextContent('long');
+  });
+
+  test('ZWJの結合文字は1文字としてカウントしない', () => {
+
+    const value: Field = {
+      str: '12345👨‍👩‍👧‍👦',
+      num: '100',
+      email: '',
+      array: ['test'],
+      custom: '',
+    };
+    const component = render(
+      <Validation {...value} />
+    );
+
+    fireEvent.click(component.getByTestId('validate'));
+
+    const str = component.container.querySelector('#str');
+    expect(str).toHaveTextContent('long');
+  });
+
   test('メールアドレス形式エラー', () => {
 
     const value: Field = {

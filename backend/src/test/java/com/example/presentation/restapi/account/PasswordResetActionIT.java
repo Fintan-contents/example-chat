@@ -2,6 +2,7 @@ package com.example.presentation.restapi.account;
 
 import com.example.MailHelper;
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -30,8 +31,8 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("mailAddress", mailAddress));
         HttpResponse resetResponse = sendRequest(resetRequest);
-        assertEquals(204, resetResponse.getStatusCode());
 
+        assertEquals(204, resetResponse.getStatusCode());
         validateByOpenAPI("post-reset_password", resetRequest, resetResponse);
 
         // メールを検索する
@@ -44,8 +45,8 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest verifyRequest = post("/api/reset_password/verify").setContentType("application/json")
                 .setBody(Map.of("token", token));
         HttpResponse verifyResponse = sendRequest(verifyRequest);
-        assertEquals(204, verifyResponse.getStatusCode());
 
+        assertEquals(204, verifyResponse.getStatusCode());
         validateByOpenAPI("post-reset_password-verify", verifyRequest, verifyResponse);
 
         // 新パスワードを設定する
@@ -53,8 +54,8 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest passwordNewRequest = post("/api/reset_password/new").setContentType("application/json")
                 .setBody(Map.of("token", token, "newPassword", newPassword));
         HttpResponse passwordNewResponse = sendRequest(passwordNewRequest);
-        assertEquals(204, passwordNewResponse.getStatusCode());
 
+        assertEquals(204, passwordNewResponse.getStatusCode());
         validateByOpenAPI("post-reset_password-new", passwordNewRequest, passwordNewResponse);
 
         // リセット後の新パスワードでログインできること
@@ -72,18 +73,26 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("mailAddress", invalidMailAddress));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-reset_password", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/reset_password")
                 .setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-reset_password", response);
     }
 
     @Test
-    public void パスワードリセットの認証トークンが不正() {
+    public void パスワードリセットのトークン検証でトークンが不正() {
         loadCsrfToken();
 
         String[] invalidUserTokens = new String[] { "", "        " };
@@ -92,17 +101,41 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/reset_password/verify").setContentType("application/json")
                     .setBody(Map.of("token", invalidUserToken));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-reset_password-verify", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/reset_password/verify").setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-reset_password-verify", response);
     }
 
     @Test
-    public void 新パスワード設定のトークンが不正() {
+    public void パスワードリセットのトークン検証でトークンが無効() {
+        loadCsrfToken();
+
+        String invalidToken = "dummy";
+
+        RestMockHttpRequest request = post("/api/reset_password/verify").setContentType("application/json")
+                .setBody(Map.of("token", invalidToken));
+        HttpResponse response = sendRequest(request);
+
+        assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "token.invalid");
+        validateByOpenAPI("post-reset_password-verify", response);
+    }
+
+    @Test
+    public void 新パスワード設定でトークンが不正() {
         loadCsrfToken();
 
         String newPassword = "newPass-";
@@ -112,14 +145,39 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/reset_password/new").setContentType("application/json")
                     .setBody(Map.of("token", invalidUserToken, "newPassword", newPassword));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-reset_password-new", response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/reset_password/new").setContentType("application/json")
                 .setBody(Map.of("newPassword", newPassword));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-reset_password-new", response);
+    }
+
+    @Test
+    public void 新パスワード設定でトークンが無効() {
+        loadCsrfToken();
+
+        String newPassword = "newPass-";
+        String invalidToken = "dummy";
+
+        RestMockHttpRequest request = post("/api/reset_password/new").setContentType("application/json")
+                .setBody(Map.of("token", invalidToken, "newPassword", newPassword));
+        HttpResponse response = sendRequest(request);
+
+        assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "token.invalid");
+        validateByOpenAPI("post-reset_password-new", response);
     }
 
     @Test
@@ -133,13 +191,21 @@ public class PasswordResetActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/reset_password/new").setContentType("application/json")
                     .setBody(Map.of("token", token, "newPassword", invalidPassword));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-reset_password-new", response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/reset_password/new").setContentType("application/json")
                 .setBody(Map.of("token", token));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-reset_password-new", response);
     }
 }

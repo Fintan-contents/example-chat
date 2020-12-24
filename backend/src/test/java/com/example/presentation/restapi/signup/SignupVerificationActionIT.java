@@ -2,6 +2,7 @@ package com.example.presentation.restapi.signup;
 
 import com.example.MailHelper;
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -43,17 +44,25 @@ public class SignupVerificationActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest registerRequest = post("/api/signup/verify").setContentType("application/json")
                 .setBody(Map.of("userToken", userToken));
         HttpResponse registerResponse = sendRequest(registerRequest);
-        assertEquals(204, registerResponse.getStatusCode());
 
+        assertEquals(204, registerResponse.getStatusCode());
         validateByOpenAPI("post-signup-verify", registerRequest, registerResponse);
 
         // 同じユーザー名でサインアップするとエラーになる
         HttpResponse conflictSignupResponse = sendRequest(temporaryRegisterRequest);
+
         assertEquals(409, conflictSignupResponse.getStatusCode());
+        JsonAssert.with(conflictSignupResponse.getBodyString())
+                .assertEquals("$.code", "account.conflict");
+        validateByOpenAPI("post-signup", temporaryRegisterRequest, conflictSignupResponse);
 
         // 処理済みのトークンでもう一度本登録するとエラーになる
         HttpResponse conflictVerifyResponse = sendRequest(registerRequest);
+
         assertEquals(404, conflictVerifyResponse.getStatusCode());
+        JsonAssert.with(conflictVerifyResponse.getBodyString())
+                .assertEquals("$.code", "token.invalid");
+        validateByOpenAPI("post-signup-verify", registerRequest, conflictVerifyResponse);
 
         // 登録したアカウントでログインできること
         login(registerMailAddress, registerPassword);
@@ -91,87 +100,23 @@ public class SignupVerificationActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("userToken", userToken1));
         HttpResponse registerResponse1 = sendRequest(registerRequest1);
+
         assertEquals(204, registerResponse1.getStatusCode());
 
+        // 同じユーザー名で既に本登録済みだとエラーになる
         RestMockHttpRequest registerRequest2 = post("/api/signup/verify")
                 .setContentType("application/json")
                 .setBody(Map.of("userToken", userToken2));
         HttpResponse registerResponse2 = sendRequest(registerRequest2);
-        // 同じユーザー名で既に本登録済みのためエラーになる
-        assertEquals(409, registerResponse2.getStatusCode());
 
+        assertEquals(409, registerResponse2.getStatusCode());
+        JsonAssert.with(registerResponse2.getBodyString())
+                .assertEquals("$.code", "account.conflict");
         validateByOpenAPI("post-signup-verify", registerRequest2, registerResponse2);
     }
 
     @Test
-    public void アカウント仮登録のユーザー名が不正() {
-        loadCsrfToken();
-
-        String registerMailAddress = "testUser1@example.com";
-        String registerPassword = "password";
-        String[] invalidUserNames = new String[] { "", " " };
-
-        Arrays.stream(invalidUserNames).forEach(invalidUserName -> {
-            RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                    .setBody(Map.of("userName", invalidUserName, "mailAddress", registerMailAddress, "password", registerPassword));
-            HttpResponse response = sendRequest(request);
-            assertEquals(400, response.getStatusCode());
-        });
-
-        // 項目として送信しないケース
-        RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                .setBody(Map.of("mailAddress", registerMailAddress, "password", registerPassword));
-        HttpResponse response = sendRequest(request);
-        assertEquals(400, response.getStatusCode());
-    }
-
-    @Test
-    public void アカウント仮登録のメールアドレスが不正() {
-        loadCsrfToken();
-
-        String registerUserName = "testUser1";
-        String registerPassword = "password";
-        String[] invalidMailAddresses = new String[] { "", " ", "noDomain" };
-
-        Arrays.stream(invalidMailAddresses).forEach(invalidMailAddress -> {
-            RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                    .setBody(Map.of("userName", registerUserName, "mailAddress", invalidMailAddress, "password", registerPassword));
-            HttpResponse response = sendRequest(request);
-            assertEquals(400, response.getStatusCode());
-        });
-
-        // 項目として送信しないケース
-        RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                .setBody(Map.of("userName", registerUserName, "password", registerPassword));
-        HttpResponse response = sendRequest(request);
-        assertEquals(400, response.getStatusCode());
-        assertEquals(400, response.getStatusCode());
-    }
-
-    @Test
-    public void アカウント仮登録のパスワードが不正() {
-        loadCsrfToken();
-
-        String registerUserName = "testUser1";
-        String registerMailAddress = "testUser1@example.com";
-        String[] invalidPasswords = new String[] { "", "        ", "1234567" };
-
-        Arrays.stream(invalidPasswords).forEach(invalidPassword -> {
-            RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                    .setBody(Map.of("userName", registerUserName, "mailAddress", registerMailAddress, "password", invalidPassword));
-            HttpResponse response = sendRequest(request);
-            assertEquals(400, response.getStatusCode());
-        });
-
-        // 項目として送信しないケース
-        RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
-                .setBody(Map.of("userName", registerUserName, "mailAddress", registerMailAddress));
-        HttpResponse response = sendRequest(request);
-        assertEquals(400, response.getStatusCode());
-    }
-
-    @Test
-    public void アカウント本登録のユーザートークンとして不正() {
+    public void アカウント本登録のトークンが不正() {
         loadCsrfToken();
 
         String[] invalidUserTokens = new String[] { "", "        " };
@@ -180,12 +125,20 @@ public class SignupVerificationActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/signup/verify").setContentType("application/json")
                     .setBody(Map.of("userToken", invalidUserToken));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-signup-verify", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/signup/verify").setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-signup-verify", response);
     }
 }

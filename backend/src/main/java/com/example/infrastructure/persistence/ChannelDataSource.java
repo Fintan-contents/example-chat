@@ -134,12 +134,6 @@ public class ChannelDataSource implements ChannelRepository {
     }
 
     @Override
-    public boolean existsById(ChannelId channelId) {
-        return UniversalDao.exists(ChannelEntity.class, "SELECT_FOR_EXISTS_BY_ID",
-                Map.of("channelId", channelId.value()));
-    }
-
-    @Override
     public boolean existsBy(ChannelName channelName) {
         return UniversalDao.exists(ChannelEntity.class, "SELECT_FOR_EXISTS_BY_NAME",
                 Map.of("channelName", channelName.value()));

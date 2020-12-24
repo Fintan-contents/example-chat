@@ -20,8 +20,8 @@ public class ChannelMembersActionIT extends ExampleChatRestTestBase {
         Integer channelId = 1;
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/members");
         HttpResponse response = sendRequest(request);
-        assertEquals(200, response.getStatusCode());
 
+        assertEquals(200, response.getStatusCode());
         JsonAssert.with(response.getBodyString())
                 .assertThat("$", Matchers.hasSize(2))
                 .assertEquals("$[0].id", 1)
@@ -30,46 +30,93 @@ public class ChannelMembersActionIT extends ExampleChatRestTestBase {
                 .assertEquals("$[1].id", 2)
                 .assertEquals("$[1].name", "user2")
                 .assertEquals("$[1].isOwner", false);
-
         validateByOpenAPI("get-channels-channelId-members", request, response);
     }
 
     @Test
     public void ログインしていない場合はチャンネルの参加者を取得できない() {
         Integer channelId = 1;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/members");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-members", request, response);
     }
 
     @Test
     public void 参加していないチャンネルの参加者は取得できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 20001;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/members");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-members", request, response);
     }
 
     @Test
     public void 存在しないチャンネルの参加者は取得できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = Integer.MAX_VALUE;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/members");
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("get-channels-channelId-members", request, response);
     }
 
     @Test
     public void アカウントを招待できる() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 1;
+
         RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
                 .setContentType("application/json")
                 .setBody(Map.of("accountId", 10000));
         HttpResponse response = sendRequest(request);
         assertEquals(204, response.getStatusCode());
 
+        validateByOpenAPI("post-channels-channelId-members", request, response);
+    }
+
+    @Test
+    public void 存在しないアカウントを招待するとエラーになる() throws Exception {
+        login("user1@example.com", "pass123-");
+        Integer channelId = 1;
+
+        RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
+                .setContentType("application/json")
+                .setBody(Map.of("accountId", 99999));
+        HttpResponse response = sendRequest(request);
+
+        assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-channels-channelId-members", response);
+    }
+
+    @Test
+    public void ChatBotのチャンネルには招待できない() throws Exception {
+        login("user1@example.com", "pass123-");
+        Integer channelId = 2;
+
+        RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
+                .setContentType("application/json")
+                .setBody(Map.of("accountId", 99999));
+        HttpResponse response = sendRequest(request);
+
+        assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
         validateByOpenAPI("post-channels-channelId-members", request, response);
     }
 
@@ -84,45 +131,68 @@ public class ChannelMembersActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("accountId", invalidAccountId));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-channels-channelId-members", response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members").setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-channels-channelId-members", response);
     }
 
     @Test
     public void ログインしていない場合はアカウントを招待できない() {
         loadCsrfToken();
         Integer channelId = 1;
+
         RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
                 .setContentType("application/json")
                 .setBody(Map.of("accountId", 10000));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("post-channels-channelId-members", request, response);
     }
 
     @Test
     public void 参加していないチャンネルでアカウントを招待できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 20001;
+
         RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
                 .setContentType("application/json")
                 .setBody(Map.of("accountId", 10000));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("post-channels-channelId-members", request, response);
     }
 
     @Test
     public void 存在しないチャンネルでアカウントを招待できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = Integer.MAX_VALUE;
+
         RestMockHttpRequest request = post("/api/channels/"  + channelId + "/members")
                 .setContentType("application/json")
                 .setBody(Map.of("accountId", 10000));
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("post-channels-channelId-members", request, response);
     }
 }

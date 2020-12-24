@@ -15,10 +15,11 @@ public class ChannelInvitableAccountsActionIT extends ExampleChatRestTestBase {
     public void 招待可能なアカウント一覧を取得できる() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 1;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/invitable_accounts");
         HttpResponse response = sendRequest(request);
-        assertEquals(200, response.getStatusCode());
 
+        assertEquals(200, response.getStatusCode());
         JsonAssert.with(response.getBodyString())
                 .assertThat("$", Matchers.hasSize(4))
                 .assertEquals("$[0].id", 3)
@@ -29,33 +30,47 @@ public class ChannelInvitableAccountsActionIT extends ExampleChatRestTestBase {
                 .assertEquals("$[2].name", "openapi-example2")
                 .assertEquals("$[3].id", 10020)
                 .assertEquals("$[3].name", "openapi-example3");
-
         validateByOpenAPI("get-channels-channelId-invitable_members", request, response);
     }
 
     @Test
     public void ログインしていない場合は招待可能なアカウントを取得できない() {
         Integer channelId = 1;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/invitable_accounts");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-invitable_members", request, response);
     }
 
     @Test
     public void 参加していないチャンネルの招待可能なアカウントは取得できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 20001;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/invitable_accounts");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-invitable_members", request, response);
     }
 
     @Test
     public void 存在しないチャンネルの招待可能なアカウントは取得できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = Integer.MAX_VALUE;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/invitable_accounts");
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("get-channels-channelId-invitable_members", request, response);
     }
 }

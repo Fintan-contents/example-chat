@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useSelect, stringField, useValidation, Logger, useSystemMessages} from 'framework';
-import {Button, Form, Select, PositiveButton, Title} from 'chat/components/basics';
+import {Button, Form, Select, PositiveButton, Title, ValidationError} from 'chat/components/basics';
 import './ChannelMemberInvite.css';
 import {Link, useHistory, useParams} from 'react-router-dom';
 import { BackendService } from 'chat/backend';
@@ -22,6 +22,7 @@ const ChannelMemberInvite: React.FC = () => {
   const {channelId} = useParams<{channelId: string}>();
   const [accountId, accountIdAttributes] = useSelect('');
   const [members, setMembers] = useState<Member[]>([]);
+  const [formError, setFormError] = useState<string>('');
 
   useEffect(() => {
     BackendService.findAllMembers(Number(channelId))
@@ -34,20 +35,25 @@ const ChannelMemberInvite: React.FC = () => {
   const systemMessages = useSystemMessages();
   const { error, handleSubmit } = useValidation<FormFields>({
     accountId: stringField()
-      .required(systemMessages('errors.select', '招待するユーザ'))
+      .required(systemMessages('errors.select', '招待するユーザー'))
   });
 
-  const inviteMember = (event: React.FormEvent<HTMLFormElement>) => {
-    BackendService.postMembers(Number(channelId), Number(accountId));
+  const inviteMember = async (event: React.FormEvent<HTMLFormElement>) => {
+    const response = await BackendService.postMembers(Number(channelId), Number(accountId));
+    if(response === 'Forbidden'){
+      setFormError('このチャンネルには招待できません。');
+      return;
+    }
     history.push('/channels/' + channelId);
   };
 
   return (
     <div>
       <nav>
-        <Title>チャンネルにユーザを招待する</Title>
+        <Title>チャンネルにユーザーを招待する</Title>
       </nav>
-      <Form onSubmit={handleSubmit({accountId}, inviteMember)}>
+      <Form onSubmit={handleSubmit({accountId}, inviteMember, () => setFormError(''))}>
+        <ValidationError message={formError} />
         <InputItem title="名前" error={error.accountId}>
           <Select name="members" {...accountIdAttributes}>
             <option value=''/>
@@ -59,7 +65,7 @@ const ChannelMemberInvite: React.FC = () => {
         </InputItem>
         <span className="ChannelMemberInvite_buttonGroup">
           <Link to={'/channels/' + channelId}><Button>キャンセル</Button></Link>
-          <PositiveButton type="submit">ユーザを招待する</PositiveButton>
+          <PositiveButton type="submit">ユーザーを招待する</PositiveButton>
         </span>
       </Form>
     </div>

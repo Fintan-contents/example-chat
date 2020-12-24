@@ -13,6 +13,4 @@ public interface MessageRepository {
     void remove(ChannelId channelId, AccountId accountId);
 
     Messages findBy(ChannelId channelId, MessageId nextMessageId);
-
-    MessageId findLatestMessageId(ChannelId channelId);
 }

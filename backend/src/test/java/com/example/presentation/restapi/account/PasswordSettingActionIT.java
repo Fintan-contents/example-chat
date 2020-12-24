@@ -1,6 +1,7 @@
 package com.example.presentation.restapi.account;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -24,13 +25,13 @@ public class PasswordSettingActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("password", password, "newPassword", newPassword));
         HttpResponse response = sendRequest(request);
+
         assertEquals(204, response.getStatusCode());
+        validateByOpenAPI("put-settings-password", request, response);
 
         // 新しいパスワードでログインできること
         logout();
         login(mailAddress, newPassword);
-
-        validateByOpenAPI("put-settings-password", request, response);
     }
 
     @Test
@@ -46,19 +47,26 @@ public class PasswordSettingActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("password", mistakePassword, "newPassword", newPassword));
         HttpResponse response = sendRequest(request);
-        assertEquals(401, response.getStatusCode());
 
+        assertEquals(401, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "authentication.failed");
         validateByOpenAPI("put-settings-password", request, response);
     }
 
     @Test
     public void ログインしていない場合はパスワードを変更できない() {
         loadCsrfToken();
+
         RestMockHttpRequest request = put("/api/settings/password")
                 .setContentType("application/json")
                 .setBody(Map.of("password", "pass123-", "newPassword", "newPass-"));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("put-settings-password", request, response);
     }
 
     @Test
@@ -73,7 +81,11 @@ public class PasswordSettingActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("password", invalidPassword, "newPassword", newPassword));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("put-settings-password", response);
         });
 
         // 項目として送信しないケース
@@ -81,7 +93,11 @@ public class PasswordSettingActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("newPassword", newPassword));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("put-settings-password", response);
     }
 
     @Test

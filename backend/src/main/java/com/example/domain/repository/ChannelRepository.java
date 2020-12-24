@@ -22,8 +22,6 @@ public interface ChannelRepository {
 
     Channels findOwnersChannel(AccountId accountId);
 
-    boolean existsById(ChannelId channelId);
-
     boolean existsBy(ChannelName channelName);
 
 }

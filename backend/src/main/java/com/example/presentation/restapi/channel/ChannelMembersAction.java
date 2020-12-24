@@ -1,18 +1,24 @@
 package com.example.presentation.restapi.channel;
 
+import com.example.application.service.LoginAccountIdSupplier;
 import com.example.application.service.account.AccountSearchService;
 import com.example.application.service.channel.ChannelMemberRegistrationService;
 import com.example.application.service.channel.ChannelMemberSearchService;
+import com.example.application.service.channel.ChatBotSearchService;
 import com.example.domain.model.account.Account;
 import com.example.domain.model.account.AccountId;
 import com.example.domain.model.channel.ChannelId;
 import com.example.domain.model.channel.ChannelMembers;
+import com.example.domain.model.channel.ChatBot;
+import com.example.presentation.restapi.RestApiException;
 import com.example.system.nablarch.interceptor.CheckPermission;
 import com.example.system.nablarch.interceptor.CheckPermission.Permission;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 import nablarch.core.validation.ee.ValidatorUtil;
 import nablarch.fw.ExecutionContext;
+import nablarch.fw.web.HttpErrorResponse;
 import nablarch.fw.web.HttpRequest;
+import nablarch.fw.web.HttpResponse;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -30,12 +36,20 @@ public class ChannelMembersAction {
 
     private final ChannelMemberRegistrationService channelMemberRegistrationService;
 
+    private final ChatBotSearchService chatBotSearchService;
+
+    private final LoginAccountIdSupplier loginAccountIdSupplier;
+
     public ChannelMembersAction(AccountSearchService accountSearchService,
             ChannelMemberSearchService channelMemberSearchService,
-            ChannelMemberRegistrationService channelMemberRegistrationService) {
+            ChannelMemberRegistrationService channelMemberRegistrationService,
+            ChatBotSearchService chatBotSearchService,
+            LoginAccountIdSupplier loginAccountIdSupplier) {
         this.accountSearchService = accountSearchService;
         this.channelMemberSearchService = channelMemberSearchService;
         this.channelMemberRegistrationService = channelMemberRegistrationService;
+        this.chatBotSearchService = chatBotSearchService;
+        this.loginAccountIdSupplier = loginAccountIdSupplier;
     }
 
     @GET
@@ -54,6 +68,12 @@ public class ChannelMembersAction {
         ValidatorUtil.validate(requestBody);
         ChannelId channelId = new ChannelId(Long.valueOf(request.getParam("channelId")[0]));
         AccountId accountId = requestBody.accountId;
+
+        ChatBot chatBot = chatBotSearchService.findBy(loginAccountIdSupplier.supply());
+        if (chatBot.channelId().value().equals(channelId.value())) {
+            throw new RestApiException(HttpResponse.Status.FORBIDDEN, "access.denied");
+        }
+
         channelMemberRegistrationService.insert(channelId, accountId);
     }
 

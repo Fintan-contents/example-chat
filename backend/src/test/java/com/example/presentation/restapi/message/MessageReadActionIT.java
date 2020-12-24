@@ -1,6 +1,7 @@
 package com.example.presentation.restapi.message;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -21,8 +22,8 @@ public class MessageReadActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("messageId", messageId));
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("put-read-channelId", request, response);
     }
 
@@ -37,14 +38,22 @@ public class MessageReadActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("messageId", invalidMessageId));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("put-read-channelId", response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = put("/api/read/" + channelId)
                 .setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("put-read-channelId", response);
     }
 
     @Test
@@ -52,11 +61,17 @@ public class MessageReadActionIT extends ExampleChatRestTestBase {
         loadCsrfToken();
         Integer channelId = 1;
         Integer messageId = 1;
+
         RestMockHttpRequest request = put("/api/read/" + channelId)
                 .setContentType("application/json")
                 .setBody(Map.of("messageId", messageId));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("put-read-channelId", response);
+
     }
 
     @Test
@@ -64,11 +79,16 @@ public class MessageReadActionIT extends ExampleChatRestTestBase {
         login("user1@example.com", "pass123-");
         Integer channelId = 20001;
         Integer messageId = 1;
+
         RestMockHttpRequest request = put("/api/read/" + channelId)
                 .setContentType("application/json")
                 .setBody(Map.of("messageId", messageId));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("put-read-channelId", response);
     }
 
     @Test

@@ -3,6 +3,11 @@ stages:
   - integration-test
   - build
   - deploy
+  - build-for-aws
+  - deploy-deployment-setting
+  - deploy-to-aws
+variables:
+  ECR_REGISTRY: 777221001925.dkr.ecr.ap-northeast-1.amazonaws.com
 
 test-frontend:
   image: node:12.16.1-slim
@@ -11,28 +16,27 @@ test-frontend:
     - .ci/test-frontend.sh
   artifacts:
     reports:
-      junit: 
+      junit:
         - frontend/junit.xml
-
-test-backend:
-  image: maven:3.6.3-jdk-11-slim
-  stage: test
-  script:
-    - .ci/test-backend.sh
-  artifacts:
-    reports:
-      junit: 
-        - backend/target/surefire-reports/TEST-*.xml
-
-test-notifier:
-  image: maven:3.6.3-jdk-11-slim
-  stage: test
-  script:
-    - .ci/test-notifier.sh
-  artifacts:
-    reports:
-      junit: 
-        - notifier/target/surefire-reports/TEST-*.xml
+        # test-backend:
+        #   image: maven:3.6.3-jdk-11-slim
+        #   stage: test
+        #   script:
+        #     - .ci/test-backend.sh
+        #   artifacts:
+        #     reports:
+        #       junit:
+        #         - backend/target/surefire-reports/TEST-*.xml
+        #
+        # test-notifier:
+        #   image: maven:3.6.3-jdk-11-slim
+        #   stage: test
+        #   script:
+        #     - .ci/test-notifier.sh
+        #   artifacts:
+        #     reports:
+        #       junit:
+        #         - notifier/target/surefire-reports/TEST-*.xml
 
 integration-test-backend:
   image: maven:3.6.3-jdk-11-slim
@@ -58,7 +62,8 @@ integration-test-backend:
     - .ci/integration-test-backend.sh
   artifacts:
     reports:
-      junit: 
+      junit:
+        - backend/target/surefire-reports/TEST-*.xml
         - backend/target/failsafe-reports/TEST-*.xml
 
 integration-test-notifier:
@@ -72,7 +77,8 @@ integration-test-notifier:
     - .ci/integration-test-notifier.sh
   artifacts:
     reports:
-      junit: 
+      junit:
+        - notifier/target/surefire-reports/TEST-*.xml
         - notifier/target/failsafe-reports/TEST-*.xml
 
 deploy-backend:
@@ -81,6 +87,8 @@ deploy-backend:
   only:
     refs:
       - master
+    changes:
+      - backend/**/*
   script:
     - .ci/deploy-backend.sh
 
@@ -90,8 +98,120 @@ deploy-notifier:
   only:
     refs:
       - master
+    changes:
+      - notifier/**/*
   script:
     - .ci/deploy-notifier.sh
+
+deploy-nginx:
+  image: docker:19.03.13
+  stage: deploy
+  services:
+    - docker:19.03.13-dind
+  only:
+    changes:
+      - docker/nginx/**/*
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - .ci/deploy-nginx.sh
+
+.deploy-aws:
+  image: docker:19.03.13
+  stage: deploy-to-aws
+  # Epona の提供する GitLab Runner からであれば credential なしで ECR に PUSH 可能
+  tags:
+    - epona
+  variables:
+    AWS_DEFAULT_REGION: $EPONA_AWS_DEFAULT_REGION
+  services:
+    - name: docker:19.03.13-dind
+  only:
+    refs:
+      - master
+  before_script:
+    - .ci/install-awscliv2-on-alpine.sh
+
+deploy-backend-to-ecr:
+  extends: .deploy-aws
+  variables:
+    IMAGE_PUSHED_TO_ECR: $CI_REGISTRY_IMAGE/example-chat-backend:$CI_COMMIT_REF_NAME
+    ECR_REPOSITORY: ${ECR_REGISTRY}/epona-chat-example-backend
+  only:
+    changes:
+      - backend/**/*
+  script:
+    - .ci/deploy-to-ecr.sh
+
+deploy-notifier-to-ecr:
+  extends: .deploy-aws
+  variables:
+    IMAGE_PUSHED_TO_ECR: $CI_REGISTRY_IMAGE/example-chat-notifier:$CI_COMMIT_REF_NAME
+    ECR_REPOSITORY: ${ECR_REGISTRY}/epona-chat-example-notifier
+  only:
+    changes:
+      - notifier/**/*
+  script:
+    - .ci/deploy-to-ecr.sh
+
+.deploy-deployment-settings:
+  image:
+    name: amazon/aws-cli:2.1.4
+    entrypoint: [""]
+  stage: deploy-deployment-setting
+  tags:
+    - epona
+  variables:
+    AWS_DEFAULT_REGION: $EPONA_AWS_DEFAULT_REGION
+    DEPLOYMENT_SETTING_NAME: settings.zip
+
+deploy-backend-deployment-settings:
+  extends: .deploy-deployment-settings
+  variables:
+    S3_BUCKET_NAME: chat-backend-pipeline-source
+    SETTING_DIR: backend/deploy
+  script:
+    - .ci/deploy-settings.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "backend/**/*"
+
+deploy-notifier-deployment-settings:
+  extends: .deploy-deployment-settings
+  variables:
+    S3_BUCKET_NAME: chat-ntfr-pipeline-source
+    SETTING_DIR: notifier/deploy
+  script:
+    - .ci/deploy-settings.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+      changes:
+        - "notifier/**/*"
+
+deploy-nginx-backend-to-ecr:
+  extends: .deploy-aws
+  variables:
+    IMAGE_PUSHED_TO_ECR: $CI_REGISTRY_IMAGE/nginx-backend:$CI_COMMIT_REF_NAME
+    ECR_REPOSITORY: ${ECR_REGISTRY}/epona-backend-nginx
+  only:
+    changes:
+      - docker/nginx/**/*
+      - docker/nginx/*
+  script:
+    - .ci/deploy-to-ecr.sh
+
+deploy-nginx-notifier-to-ecr:
+  extends: .deploy-aws
+  variables:
+    IMAGE_PUSHED_TO_ECR: $CI_REGISTRY_IMAGE/nginx-notifier:$CI_COMMIT_REF_NAME
+    ECR_REPOSITORY: ${ECR_REGISTRY}/epona-notifier-nginx
+  only:
+    changes:
+      - docker/nginx/**/*
+      - docker/nginx/*
+  script:
+    - .ci/deploy-to-ecr.sh
 
 build-frontend:e2e:
   image: node:12.16.1-slim
@@ -121,6 +241,35 @@ deploy-frontend:e2e:
     - .ci/deploy-frontend.sh
   dependencies:
     - build-frontend:e2e
+
+build-frontend:aws:
+  image: node:12.16.1-slim
+  stage: build-for-aws
+  only:
+    refs:
+      - master
+    changes:
+      - frontend/**/*
+  variables:
+    REACT_APP_BACKEND_BASE_URL: $EPONA_REACT_APP_BACKEND_BASE_URL
+  script:
+    - .ci/build-frontend.sh
+  artifacts:
+    paths:
+      - frontend/build
+
+deploy-frontend-to-s3:
+  extends: .deploy-aws
+  variables:
+    PUSH_TO_S3_BUCKET_NAME: $EPONA_FRONTEND_PUSH_TO_S3_BUCKET_NAME
+    ARCHIVE_FILE_NAME: $EPONA_FRONTEND_ARCHIVE_FILE_NAME
+  only:
+    changes:
+      - frontend/**/*
+  script:
+    - .ci/deploy-to-s3.sh
+  dependencies:
+    - build-frontend:aws
 
 cache:
   key:

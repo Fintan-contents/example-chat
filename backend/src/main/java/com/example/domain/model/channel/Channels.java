@@ -14,4 +14,8 @@ public class Channels {
     public List<Channel> asList() {
         return Collections.unmodifiableList(channels);
     }
+
+    public boolean isEmpty() {
+        return channels.isEmpty();
+    }
 }

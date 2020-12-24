@@ -82,7 +82,7 @@
              class="nablarch.common.handler.threadcontext.ThreadContextHandler">
     <property name="attributes">
       <list>
-        <!-- ユーザID(セッションストアから取得) -->
+        <!-- ユーザーID(セッションストアから取得) -->
         <component class="nablarch.common.web.handler.threadcontext.UserIdAttributeInSessionStore">
           <property name="sessionKey" value="user.id"/>
         </component>
@@ -107,17 +107,21 @@
         <component class="nablarch.common.handler.threadcontext.TimeZoneAttribute">
           <property name="defaultTimeZone" value="${nablarch.timeZoneAttribute.defaultTimeZone}"/>
         </component>
-        
+
         <!-- HTTPメソッド -->
         <component class="com.example.system.nablarch.threadcontext.HttpMethodAttribute"/>
-        
+
         <!-- セッションID -->
         <component class="com.example.system.nablarch.threadcontext.SessionIdAttribute"/>
       </list>
     </property>
   </component>
 
-  <component name="csrfTokenVerificationHandler" class="nablarch.fw.web.handler.CsrfTokenVerificationHandler" />
+  <component name="csrfTokenVerificationHandler" class="nablarch.fw.web.handler.CsrfTokenVerificationHandler" >
+    <property name="verificationFailureHandler">
+      <component class="com.example.system.nablarch.handler.csrf.CsrfTokenVerificationFailureHandler"/>
+    </property>
+  </component>
   <component name="csrfTokenEndpointHandler" class="com.example.system.nablarch.handler.csrf.CsrfTokenEndpointHandler" />
 
   <!-- CORS設定 -->
@@ -157,6 +161,9 @@
         <component class="nablarch.common.handler.threadcontext.ThreadContextClearHandler"/>
 
         <component class="nablarch.fw.jaxrs.JaxRsResponseHandler">
+          <property name="errorResponseBuilder">
+            <component class="com.example.system.nablarch.jaxrs.JaxRsUnknownErrorResponseBuilder"/>
+          </property>
           <property name="responseFinishers">
             <list>
               <!-- CORSレスポンス -->
@@ -211,13 +218,15 @@
         </component>
 
         <!-- ファイルアップロード用に追加 -->
-        <component-ref name="multipartHandler"/>
+        <component class="com.example.system.nablarch.handler.MultipartErrorHandler">
+          <property name="multipartHandler" ref="multipartHandler"/>
+        </component>
 
         <component-ref name="dbConnectionManagementHandler"/>
 
         <component-ref name="transactionManagementHandler"/>
 
-        <component class="com.example.system.nablarch.handler.ChatApplicationExceptionMappingStatusCodeHandler"/>
+        <component class="com.example.system.nablarch.handler.RestApiErrorResponseHandler"/>
 
         <component-ref name="packageMapping"/>
       </list>

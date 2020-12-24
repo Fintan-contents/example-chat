@@ -3,7 +3,6 @@ package com.example.presentation.restapi.account;
 import com.example.application.service.LoginAccountIdSupplier;
 import com.example.domain.model.account.RawPassword;
 import com.example.application.service.account.AccountRegistrationService;
-import com.example.presentation.restapi.LoginContext;
 import nablarch.common.web.session.SessionUtil;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 import nablarch.core.validation.ee.ValidatorUtil;

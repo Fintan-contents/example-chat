@@ -1,9 +1,6 @@
 package com.example.application.service.account;
 
-import com.example.application.ApplicationConfig;
-import com.example.application.InvalidSignupTokenException;
-import com.example.application.MismatchedCredentialException;
-import com.example.application.UserNameConflictException;
+import com.example.application.*;
 import com.example.application.service.channel.ChannelMemberRegistrationService;
 import com.example.domain.model.notification.Mailer;
 import com.example.domain.model.notification.SignupVerificationMail;
@@ -65,6 +62,10 @@ public class AccountRegistrationService {
         if (accountRepository.existsBy(userName)) {
             throw new UserNameConflictException();
         }
+        if (accountRepository.existsBy(mailAddress)) {
+            // エラーにすると登録済みメールアドレスの探索が可能になるため、メールを送信せずに正常終了にする
+            return;
+        }
         TemporaryUserToken userToken = userTokenProvider.generate();
         HashedPassword password = passwordHashingProcessor.hash(rawPassword);
         TemporaryAccount temporaryAccount = new TemporaryAccount(userToken, userName, mailAddress, password);
@@ -78,7 +79,7 @@ public class AccountRegistrationService {
     public void verifyAccount(TemporaryUserToken userToken) {
         TemporaryAccount temporaryAccount = temporaryAccountRepository.findBy(userToken);
         if (temporaryAccount == null) {
-            throw new InvalidSignupTokenException();
+            throw new InvalidTokenException();
         }
         if (accountRepository.existsBy(temporaryAccount.userName())) {
             throw new UserNameConflictException();
@@ -103,7 +104,7 @@ public class AccountRegistrationService {
     public void deleteAccount(AccountId accountId, RawPassword rawPassword) {
         AccountPassword accountPassword = passwordRepository.findById(accountId);
         if (!passwordHashingProcessor.matches(accountPassword.password(), rawPassword)) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
 
         channelRegistrationService.deleteChatBot(accountId);
@@ -117,7 +118,7 @@ public class AccountRegistrationService {
     public void changePassword(AccountId accountId, RawPassword password, RawPassword newPassword) {
         AccountPassword accountPassword = passwordRepository.findById(accountId);
         if (!passwordHashingProcessor.matches(accountPassword.password(), password)) {
-            throw new MismatchedCredentialException();
+            throw new AuthenticationException();
         }
 
         AccountPassword changedAccountPassword = accountPassword.change(passwordHashingProcessor.hash(newPassword));

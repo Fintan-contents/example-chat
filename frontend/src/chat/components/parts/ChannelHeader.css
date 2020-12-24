@@ -8,7 +8,9 @@
   padding: 0 22px;
 }
 .ChannelHeader_header h3 {
-  max-width: 41%;
+  max-width: 48%;
+  font-size: 16px;
+  line-height: 1em;
   word-break: break-all;
 }
 
@@ -17,7 +19,7 @@
   list-style: none;
 }
 .ChannelHeader_navigation li {
-  margin-left: 18px;
+  margin-right: 14px;
   cursor: pointer;
 }
 .ChannelHeader_navigation a {

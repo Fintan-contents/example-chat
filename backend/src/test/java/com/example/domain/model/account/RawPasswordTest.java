@@ -17,7 +17,7 @@ public class RawPasswordTest {
     @ValueSource(strings = { "pass123-" })
     @MethodSource("justMaxlength")
     void validWith(String value) {
-        new RawPassword(value);
+        assertDoesNotThrow(() -> new RawPassword(value));
     }
 
     @Test
@@ -26,19 +26,23 @@ public class RawPasswordTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "", " ", "1234567" })
-    @MethodSource("overMaxlength")
+    @MethodSource({"overMaxlength", "underMinLength"})
     void invalidWith(String value) {
         assertThrows(IllegalArgumentException.class, () -> new RawPassword(value));
     }
 
     static Stream<String> justMaxlength() {
         String text = IntStream.range(0, 50).mapToObj(i -> "x").collect(Collectors.joining());
-        return Stream.of(text);
+        String surrogatePair = "𩸽" + text.substring(1);
+        return Stream.of(text, surrogatePair);
     }
 
     static Stream<String> overMaxlength() {
         String text = IntStream.range(0, 51).mapToObj(i -> "x").collect(Collectors.joining());
         return Stream.of(text);
+    }
+
+    static Stream<String> underMinLength() {
+        return Stream.of("", " ", "1234567", "123456𩸽");
     }
 }

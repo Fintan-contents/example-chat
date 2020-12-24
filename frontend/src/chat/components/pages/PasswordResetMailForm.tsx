@@ -29,12 +29,8 @@ const PasswordResetMailForm: React.FC = () => {
 
   const resetPassword: React.FormEventHandler<HTMLFormElement> = async (event) => {
     setProcessing(true);
-    try {
-      await BackendService.issuePasswordResetToken(mailAddress);
-      history.push('/password-reset-mail');
-    } finally {
-      setProcessing(false);
-    }
+    await BackendService.issuePasswordResetToken(mailAddress);
+    history.push('/password-reset-mail');
   };
 
   return (

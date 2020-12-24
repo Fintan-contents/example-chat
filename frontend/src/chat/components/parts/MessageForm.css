@@ -15,6 +15,10 @@
   outline: none;
 }
 
+.MessageForm_inputFile {
+  display: none;
+}
+
 .MessageForm_sendButton {
   height: 40px;
   padding: 0px 20px;

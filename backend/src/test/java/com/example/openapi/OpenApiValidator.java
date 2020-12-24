@@ -45,6 +45,12 @@ public class OpenApiValidator {
 
     public void validate(String operationId, RestMockHttpRequest request, HttpResponse response)
             throws ValidationException {
+        validateRequest(operationId, request);
+        validateResponse(operationId, response);
+
+    }
+
+    public void validateRequest(String operationId, RestMockHttpRequest request) throws ValidationException {
         String requestUri = request.getRequestUri();
         Request.Method method = Request.Method.getMethod(request.getMethod());
         DefaultRequest.Builder requestBuilder = new DefaultRequest.Builder(requestUri, method)
@@ -62,7 +68,9 @@ public class OpenApiValidator {
             }
         }
         validateRequest(operationId, requestBuilder.build());
+    }
 
+    public void validateResponse(String operationId, HttpResponse response) throws ValidationException {
         validateResponse(operationId,
                 new DefaultResponse.Builder(response.getStatusCode())
                         .headers(formatHeaderMap(getResponseHeaders(response)))
@@ -71,6 +79,11 @@ public class OpenApiValidator {
 
     public void validate(String operationId, HttpRequest request, java.net.http.HttpResponse<?> response)
             throws ValidationException, JsonProcessingException {
+        validateRequest(operationId, request);
+        validateResponse(operationId, response);
+    }
+
+    public void validateRequest(String operationId, HttpRequest request) throws ValidationException {
         String requestUri = request.uri().toString();
         Request.Method method = Request.Method.getMethod(request.method());
         DefaultRequest.Builder requestBuilder = new DefaultRequest.Builder(requestUri, method)
@@ -82,7 +95,10 @@ public class OpenApiValidator {
         request.bodyPublisher()
                 .ifPresent(p -> p.subscribe(new StringSubscriber(v -> requestBuilder.body(Body.from(v)))));
         validateRequest(operationId, requestBuilder.build());
+    }
 
+    public void validateResponse(String operationId, java.net.http.HttpResponse<?> response)
+            throws ValidationException, JsonProcessingException {
         DefaultResponse.Builder responseBuilder = new DefaultResponse.Builder(response.statusCode())
                 .headers(convertType(response.headers()));
         if (response.body() != null) {
@@ -119,8 +135,7 @@ public class OpenApiValidator {
             }
 
         }
-
-        validator.validate(request, getPathItem(operationId), operation);
+        validator.validate(request);
     }
 
     public void validateResponse(String operationId, Response response) throws ValidationException {

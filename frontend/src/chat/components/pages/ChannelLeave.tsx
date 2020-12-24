@@ -47,12 +47,12 @@ const ChannelLeave: React.FC = () => {
   return (
     <div>
       <nav className="ChannelLeave_nav">
-        <Title>#{channel.name}チャンネルから退出する</Title>
+        <Title>#{channel.name}から退出する</Title>
       </nav>
       <div className="ChannelLeave_content">
         <ValidationError message={message}/>
         <p className="ChannelLeave_description">
-          #{channel.name}チャンネルから退出しますか？<br />
+          #{channel.name}から退出しますか？<br />
           退出すると、再度招待されない限りこのチャンネルを参照できなくなります。
         </p>
         <Form onSubmit={handleSubmit}>

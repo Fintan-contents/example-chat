@@ -50,6 +50,12 @@ public class WebSocketEndpoint implements Disposable {
         this.authenticationService = authenticationService;
         this.notifierManager = notifierManager;
         this.maxIdleTimeoutSeconds = maxIdleTimeoutSeconds;
+        // 開発時はmvn jetty:runで動かしているが、その場合にonOpenメソッドではスレッドコンテキストクラスローダーに
+        // MavenのClassRealmがセットされ、WebSocketNotifierクラスのローディングでエラーが発生する場合がある。
+        // (static finalなロガー変数の初期化でエラーになる)
+        // workaroundにはなるが、WebSocketEndpointのコンストラクタでWebSocketNotifierクラスのローディングを
+        // 済ませておく。
+        new WebSocketNotifier(null, null);
     }
 
     @Override
@@ -89,8 +95,9 @@ public class WebSocketEndpoint implements Disposable {
         }
         session.setMaxIdleTimeout(TimeUnit.SECONDS.toMillis(maxIdleTimeoutSeconds));
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.logDebug("Set max idle timeout to " + maxIdleTimeoutSeconds + " seconds: session = " + session
-                    + ", accountId = " + accountId);
+            LOGGER
+                    .logDebug("Set max idle timeout to " + maxIdleTimeoutSeconds + " seconds: session = " + session
+                            + ", accountId = " + accountId);
         }
     }
 

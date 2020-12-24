@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ public class MailAddressTest {
     @ValueSource(strings = { "test@example.com" })
     @MethodSource("justMaxlength")
     void validWith(String value) {
-        new MailAddress(value);
+        assertDoesNotThrow(() -> new MailAddress(value));
     }
 
     @Test
@@ -36,7 +37,8 @@ public class MailAddressTest {
         String text = IntStream
                 .range(0, 50 - "@example.com".length())
                 .mapToObj(i -> "x").collect(Collectors.joining()) + "@example.com";
-        return Stream.of(text);
+        String surrogatePair = "𩸽" + text.substring(1);
+        return Stream.of(text, surrogatePair);
     }
 
     static Stream<String> overMaxlength() {

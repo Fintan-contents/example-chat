@@ -2,6 +2,7 @@ package com.example.presentation.restapi.system;
 
 import static org.junit.Assert.*;
 
+import com.jayway.jsonassert.JsonAssert;
 import org.junit.Test;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
@@ -17,8 +18,8 @@ public class SystemInfoNotificationActionIT extends ExampleChatRestTestBase {
 
         RestMockHttpRequest request = post("/api/systeminfo/notification");
         HttpResponse response = sendRequest(request);
-        assertEquals(200, response.getStatusCode());
 
+        assertEquals(200, response.getStatusCode());
         validateByOpenAPI("get-systeminfo-notification", request, response);
     }
 
@@ -27,8 +28,10 @@ public class SystemInfoNotificationActionIT extends ExampleChatRestTestBase {
         loadCsrfToken();
         RestMockHttpRequest request = post("/api/systeminfo/notification");
         HttpResponse response = sendRequest(request);
-        assertEquals(403, response.getStatusCode());
 
+        assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
         validateByOpenAPI("get-systeminfo-notification", request, response);
     }
 }

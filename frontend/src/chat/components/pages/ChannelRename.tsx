@@ -50,6 +50,10 @@ const ChannelRename: React.FC = () => {
       setFormError(systemMessages('errors.conflict', 'チャンネル名'));
       return;
     }
+    if(response === 'Forbidden'){
+      setFormError('このチャンネル名は変更できません。');
+      return;
+    }
     history.push('/channels/' + channelId);
   };
 

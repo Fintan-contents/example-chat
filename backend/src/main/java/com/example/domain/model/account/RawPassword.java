@@ -29,10 +29,10 @@ public class RawPassword {
     }
 
     private static void validateLength(String value) {
-        if (value.length() < MIN_LENGTH) {
+        if (value.codePointCount(0, value.length()) < MIN_LENGTH) {
             throw new IllegalArgumentException(String.format("Password length is not long enough. value=[%s]", value));
         }
-        if (value.length() > MAX_LENGTH) {
+        if (value.codePointCount(0, value.length()) > MAX_LENGTH) {
             throw new IllegalArgumentException(String.format("Password length is too long. value=[%s]", value));
         }
     }

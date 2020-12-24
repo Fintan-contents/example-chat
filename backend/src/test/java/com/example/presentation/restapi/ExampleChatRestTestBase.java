@@ -76,6 +76,14 @@ public abstract class ExampleChatRestTestBase extends SimpleRestTestSupport {
         }
     }
 
+    public void validateByOpenAPI(String operationId, HttpResponse response) {
+        try {
+            openApiValidator.validateResponse(operationId, response);
+        } catch (ValidationException e) {
+            fail(e.toString());
+        }
+    }
+
     public BlockingDeque<Map<String, Object>> connectNotificationQueue() {
         BlockingDeque<Map<String, Object>> receivedMessageQueue = new LinkedBlockingDeque<>();
         RedisClient redisClient = RedisClient.create(SystemRepository.getString("nablarch.lettuce.simple.uri"));

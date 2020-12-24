@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthenticationCodeTest {
 
     @Test
     void valid() {
-        new AuthenticationCode("123456");
+        assertDoesNotThrow(() -> new AuthenticationCode("123456"));
     }
 
     @Test
@@ -20,7 +20,7 @@ public class AuthenticationCodeTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "", " ", "1234567" })
+    @ValueSource(strings = { "", " " })
     void invalidWith(String value) {
         assertThrows(IllegalArgumentException.class, () -> new AuthenticationCode(value));
     }

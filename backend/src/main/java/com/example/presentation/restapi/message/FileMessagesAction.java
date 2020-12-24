@@ -8,6 +8,7 @@ import com.example.domain.model.channel.ChannelId;
 import com.example.domain.model.message.ImageData;
 import com.example.domain.model.message.ImageFile;
 import com.example.domain.model.message.ImageKey;
+import com.example.presentation.restapi.RestApiException;
 import com.example.system.nablarch.interceptor.CheckPermission;
 import com.example.system.nablarch.interceptor.CheckPermission.Permission;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
@@ -52,12 +53,12 @@ public class FileMessagesAction {
 
         List<PartInfo> partInfoList = request.getPart("image");
         if (partInfoList.isEmpty()) {
-            throw new HttpErrorResponse(HttpResponse.Status.BAD_REQUEST.getStatusCode());
+            throw new RestApiException(HttpResponse.Status.BAD_REQUEST, "request");
         }
 
         PartInfo partInfo = partInfoList.get(0);
         if (!ALLOW_CONTENT_TYPE.contains(partInfo.getContentType())) {
-            throw new HttpErrorResponse(HttpResponse.Status.BAD_REQUEST.getStatusCode());
+            throw new RestApiException(HttpResponse.Status.BAD_REQUEST, "request");
         }
 
         ImageFile imageFile = new ImageFile(partInfo.getSavedFile().toPath(), partInfo.getContentType());

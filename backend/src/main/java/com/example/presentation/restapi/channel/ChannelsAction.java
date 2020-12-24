@@ -1,8 +1,6 @@
 package com.example.presentation.restapi.channel;
 
-import com.example.application.service.channel.ChannelRegistrationService;
-import com.example.application.service.channel.ChannelSearchService;
-import com.example.application.service.channel.ChatBotSearchService;
+import com.example.application.service.channel.*;
 import com.example.application.service.LoginAccountIdSupplier;
 import com.example.domain.model.account.AccountId;
 import com.example.domain.model.channel.*;
@@ -21,40 +19,28 @@ import java.util.stream.Collectors;
 @Path("/channels")
 public class ChannelsAction {
 
-    private final ChannelSearchService channelSearchService;
-
     private final ChannelRegistrationService channelRegistrationService;
-
-    private final ChatBotSearchService chatBotSearchService;
 
     private final LoginAccountIdSupplier loginAccountIdSupplier;
 
-    public ChannelsAction(ChannelSearchService channelSearchService,
-            ChannelRegistrationService channelRegistrationService, ChatBotSearchService chatBotSearchService,
-            LoginAccountIdSupplier loginAccountIdSupplier) {
-        this.channelSearchService = channelSearchService;
+    private final ChannelReadingStatusQueryService channelReadingStatusQueryService;
+
+    public ChannelsAction(ChannelRegistrationService channelRegistrationService,
+            LoginAccountIdSupplier loginAccountIdSupplier,
+          ChannelReadingStatusQueryService channelReadingStatusQueryService) {
         this.channelRegistrationService = channelRegistrationService;
-        this.chatBotSearchService = chatBotSearchService;
         this.loginAccountIdSupplier = loginAccountIdSupplier;
+        this.channelReadingStatusQueryService = channelReadingStatusQueryService;
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<ChannelResponse> list(HttpRequest request, ExecutionContext context) {
+    public List<ChannelResponse> list(HttpRequest request) {
         AccountId accountId = loginAccountIdSupplier.supply();
-        Channels channels = channelSearchService.findAll(accountId);
 
-        ChatBot chatBot = chatBotSearchService.findBy(accountId);
-        Channel chatBotChannel = new Channel(chatBot.channelId(), new ChannelName(ChatBot.SystemUser.NAME.value()),
-                new ChannelOwner(ChatBot.SystemUser.ID),
-                List.of(new ChannelMember(ChatBot.SystemUser.ID), new ChannelMember(accountId)), ChannelType.SYSTEM);
+        List<ChannelReadingStatusDto> list = channelReadingStatusQueryService.find(accountId);
 
-        List<ChannelResponse> response = channels.asList().stream().map(c -> createChannelResponse(c, accountId))
-                .collect(Collectors.toList());
-
-        boolean isReadAllChatBotMessages = channelSearchService.isReadAllMessages(chatBot.channelId(), accountId);
-        response.add(new ChannelResponse(chatBotChannel, isReadAllChatBotMessages));
-        return response;
+        return list.stream().map(ChannelResponse::new).collect(Collectors.toList());
     }
 
     @POST
@@ -66,11 +52,6 @@ public class ChannelsAction {
         AccountId accountId = loginAccountIdSupplier.supply();
 
         channelRegistrationService.registerChannel(channelName, accountId);
-    }
-
-    private ChannelResponse createChannelResponse(Channel channel, AccountId accountId) {
-        boolean allRead = channelSearchService.isReadAllMessages(channel.id(), accountId);
-        return new ChannelResponse(channel, allRead);
     }
 
     public static class ChannelPostRequest {
@@ -85,18 +66,15 @@ public class ChannelsAction {
 
         public String name;
 
-        public Long ownerId;
-
         public String type;
 
         public boolean allRead;
 
-        public ChannelResponse(Channel channel, boolean allRead) {
-            this.id = channel.id().value();
-            this.name = channel.name().value();
-            this.ownerId = channel.owner().accountId().value();
-            this.type = channel.type().name();
-            this.allRead = allRead;
+        public ChannelResponse(ChannelReadingStatusDto dto) {
+            this.id = dto.getChannelId();
+            this.name = dto.getChannelName();
+            this.type = dto.getType();
+            this.allRead = dto.getLastReadMessageId().equals(dto.getLatestMessageId());
         }
     }
 }

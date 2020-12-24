@@ -20,6 +20,7 @@ public class ChannelsActionIT extends ExampleChatRestTestBase {
         login("user1@example.com", "pass123-");
         RestMockHttpRequest request = get("/api/channels");
         HttpResponse response = sendRequest(request);
+
         assertEquals(200, response.getStatusCode());
         JsonAssert.with(response.getBodyString())
                 .assertThat("$", Matchers.hasSize(2));
@@ -31,7 +32,11 @@ public class ChannelsActionIT extends ExampleChatRestTestBase {
     public void ログインしていない場合はチャンネル一覧を取得できない() {
         RestMockHttpRequest request = get("/api/channels");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels", request, response);
     }
 
     @Test
@@ -42,8 +47,8 @@ public class ChannelsActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("channelName", channelName));
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("post-channels", request, response);
     }
 
@@ -55,8 +60,10 @@ public class ChannelsActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("channelName", channelName));
         HttpResponse response = sendRequest(request);
-        assertEquals(409, response.getStatusCode());
 
+        assertEquals(409, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.conflict");
         validateByOpenAPI("post-channels", request, response);
     }
 
@@ -70,33 +77,36 @@ public class ChannelsActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("channelName", invalidChannelName));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-channels", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/channels").setContentType("application/json");
         HttpResponse response = sendRequest(request);
-        assertEquals(400, response.getStatusCode());
-    }
 
-    @Test
-    public void チャンネル名を渡さない場合はチャンネルを作成できない() throws Exception {
-        login("user1@example.com", "pass123-");
-        RestMockHttpRequest request = post("/api/channels")
-                .setContentType("application/json")
-                .setBody(Map.of("channelName", ""));
-        HttpResponse response = sendRequest(request);
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-channels", response);
     }
 
     @Test
     public void ログインしていない場合はチャンネルを作成できない() {
         loadCsrfToken();
         String channelName = UUID.randomUUID().toString();
+
         RestMockHttpRequest request = post("/api/channels")
                 .setContentType("application/json")
                 .setBody(Map.of("channelName", channelName));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("post-channels", request, response);
     }
 }

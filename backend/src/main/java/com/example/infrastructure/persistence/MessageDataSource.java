@@ -55,13 +55,6 @@ public class MessageDataSource implements MessageRepository {
     }
 
     @Override
-    public MessageId findLatestMessageId(ChannelId channelId) {
-        MessageEntity entity = UniversalDao.findBySqlFile(MessageEntity.class, "SELECT_LATEST_MESSAGE_ID",
-                Map.of("channelId", channelId.value()));
-        return new MessageId(entity.getMessageId());
-    }
-
-    @Override
     public void add(Message message) {
         MessageEntity entity = new MessageEntity();
         entity.setMessageId(message.messageId().value());

@@ -14,5 +14,9 @@ public interface AccountRepository {
 
     Account findBy(MailAddress mailAddress);
 
+    boolean existsBy(AccountId accountId);
+
     boolean existsBy(UserName userName);
+
+    boolean existsBy(MailAddress mailAddress);
 }

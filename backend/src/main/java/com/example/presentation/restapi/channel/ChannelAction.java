@@ -55,8 +55,6 @@ public class ChannelAction {
 
         public String name;
 
-        public Long ownerId;
-
         public String type;
 
         public boolean allRead;
@@ -64,7 +62,6 @@ public class ChannelAction {
         public ChannelResponse(Channel channel, boolean allRead) {
             this.id = channel.id().value();
             this.name = channel.name().value();
-            this.ownerId = channel.owner().accountId().value();
             this.type = channel.type().name();
             this.allRead = allRead;
         }

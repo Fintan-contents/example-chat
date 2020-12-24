@@ -14,7 +14,9 @@ const ErrorPage: React.FC<Props> = ({ children }) => {
       setError(true);
       return false;
     });
-
+    // `npm start`で動かした場合、複数のuseEffectでそれぞれエラーが発生すると
+    // 次のrejectのハンドリングが2回目以降のエラーで効かず、想定外のエラーページが表示されてしまう。
+    // `npm run build`でビルドしたものを動かした場合は問題ないため、動作確認時には注意すること。
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
       console.error(event);
       setError(true);

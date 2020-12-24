@@ -55,7 +55,11 @@ const PasswordResetForm: React.FC = () => {
       return;
     }
 
-    await BackendService.resetPassword(token, newPassword);
+    const response = await BackendService.resetPassword(token, newPassword);
+    if(response === 'invalid'){
+      setFormError(systemMessages('errors.invalid.url'));
+      return;
+    }
     history.push('/password-reset-complete');
   };
 

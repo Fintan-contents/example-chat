@@ -1,15 +1,13 @@
 package com.example.application.service.channel;
 
+import com.example.application.AccountNotFoundException;
 import com.example.domain.model.account.AccountId;
 import com.example.domain.model.channel.Channel;
 import com.example.domain.model.channel.ChannelId;
 import com.example.domain.model.channel.ChannelMember;
 import com.example.domain.model.channel.Channels;
 import com.example.domain.model.message.LastReadMessage;
-import com.example.domain.repository.ChannelMemberRepository;
-import com.example.domain.repository.ChannelRepository;
-import com.example.domain.repository.MessageRepository;
-import com.example.domain.repository.ReadMessageRepository;
+import com.example.domain.repository.*;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 
 @SystemRepositoryComponent
@@ -23,17 +21,24 @@ public class ChannelMemberRegistrationService {
 
     private final ReadMessageRepository readMessageRepository;
 
+    private final AccountRepository accountRepository;
+
     public ChannelMemberRegistrationService(ChannelRepository channelRepository,
             ChannelMemberRepository channelMemberRepository,
             MessageRepository messageRepository,
-            ReadMessageRepository readMessageRepository) {
+            ReadMessageRepository readMessageRepository,
+            AccountRepository accountRepository) {
         this.channelRepository = channelRepository;
         this.channelMemberRepository = channelMemberRepository;
         this.messageRepository = messageRepository;
         this.readMessageRepository = readMessageRepository;
+        this.accountRepository = accountRepository;
     }
 
     public void insert(ChannelId channelId, AccountId accountId) {
+        if (!accountRepository.existsBy(accountId)) {
+            throw new AccountNotFoundException();
+        }
         ChannelMember channelMember = new ChannelMember(accountId);
         channelMemberRepository.add(channelId, channelMember);
 

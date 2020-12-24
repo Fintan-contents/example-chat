@@ -4,8 +4,7 @@ import com.example.application.service.authentication.AuthenticationCodeGenerato
 import com.example.domain.model.account.SecretKey;
 import com.example.domain.model.authentication.AuthenticationCode;
 import com.example.presentation.restapi.ExampleChatRestTestBase;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -27,9 +26,10 @@ public class TwoFactorAuthenticationActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/login").setContentType("application/json")
                 .setBody(Map.of("mailAddress", mailAddress, "password", password));
         HttpResponse response = sendRequest(request);
+
         assertEquals(200, response.getStatusCode());
-        JsonNode root = new ObjectMapper().readTree(response.getBodyString());
-        assertEquals("WAITING_2FA", root.get("status").asText());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.status", "WAITING_2FA");
 
         // PostgreSQLのバイナリ文字列関数が「base64、hex、escape」しか対応していないため、テストデータ投入時は文字列をBase64でデコードしている
         // テストデータと一致させるため、ここでも同様の方式にする
@@ -41,8 +41,8 @@ public class TwoFactorAuthenticationActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest login2FARequest = post("/api/2fa").setContentType("application/json")
                 .setBody(Map.of("code", code.value()));
         HttpResponse login2FAResponse = sendRequest(login2FARequest);
-        assertEquals(204, login2FAResponse.getStatusCode());
 
+        assertEquals(204, login2FAResponse.getStatusCode());
         validateByOpenAPI("post-2fa", login2FARequest, login2FAResponse);
     }
 
@@ -56,20 +56,29 @@ public class TwoFactorAuthenticationActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/login").setContentType("application/json")
                 .setBody(Map.of("mailAddress", mailAddress, "password", password));
         HttpResponse response = sendRequest(request);
+
         assertEquals(200, response.getStatusCode());
-        JsonNode root = new ObjectMapper().readTree(response.getBodyString());
-        assertEquals("WAITING_2FA", root.get("status").asText());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.status", "WAITING_2FA");
 
         // 不正なコードで二要素認証を行う
         RestMockHttpRequest login2FARequest = post("/api/2fa").setContentType("application/json")
                 .setBody(Map.of("code", "XXXXXX"));
         HttpResponse login2FAResponse = sendRequest(login2FARequest);
+
         assertEquals(401, login2FAResponse.getStatusCode());
+        JsonAssert.with(login2FAResponse.getBodyString())
+                .assertEquals("$.code", "authentication.failed");
+        validateByOpenAPI("post-2fa", login2FARequest, login2FAResponse);
 
         // 項目として送信しないケース
         RestMockHttpRequest notSendRequest = post("/api/2fa").setContentType("application/json");
         HttpResponse notSendResponse = sendRequest(notSendRequest);
+
         assertEquals(400, notSendResponse.getStatusCode());
+        JsonAssert.with(notSendResponse.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-2fa", notSendResponse);
     }
 
     @Test
@@ -87,12 +96,17 @@ public class TwoFactorAuthenticationActionIT extends ExampleChatRestTestBase {
         byte[] secretByte = Base64.getDecoder().decode("12345678901234567890123456789012");
         AuthenticationCode code = new AuthenticationCodeGenerator().generate(new SecretKey(secretByte));
 
+        // ログイン成功後はセッションがリフレッシュされるため、改めてCSRFトークンを取得しておく
+        loadCsrfToken();
+
         // 二要素認証はエラーになる
         RestMockHttpRequest login2FARequest = post("/api/2fa").setContentType("application/json")
                 .setBody(Map.of("code", code.value()));
         HttpResponse login2FAResponse = sendRequest(login2FARequest);
-        assertEquals(400, login2FAResponse.getStatusCode());
 
+        assertEquals(403, login2FAResponse.getStatusCode());
+        JsonAssert.with(login2FAResponse.getBodyString())
+                .assertEquals("$.code", "credential.notfound");
         validateByOpenAPI("post-2fa", login2FARequest, login2FAResponse);
     }
  }

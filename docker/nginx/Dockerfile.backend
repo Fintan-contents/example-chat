@@ -1,0 +1,4 @@
+FROM nginx:1.19.3-alpine
+
+COPY nginx-backend.conf /etc/nginx/nginx.conf
+COPY html/ /usr/share/nginx/html/

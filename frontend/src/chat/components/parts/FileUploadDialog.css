@@ -1,14 +1,7 @@
-.FileUploadDialog_dialog {
-  width: 400px;
-  height: 350px;
-  border: solid 0;
-  border-radius: 10px;
-}
-
 .FileUploadDialog_header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
+  position: relative;
  }
 
 .FileUploadDialog_header button {
@@ -18,6 +11,11 @@
 .FileUploadDialog_title {
   margin: 0;
 }
+.FileUploadDialog_close {
+  width: 30px;
+  position: absolute;
+  right: 0;
+}
 
 .FileUploadDialog_form {
   display: flex;
@@ -25,12 +23,9 @@
   align-items: center;
  }
 
-.FileUploadDialog_hidden {
-  display: none;
-}
-
 .FileUploadDialog_image {
-  width: 200px;
+  object-fit: cover;
+  height: 200px;
   background-color: whitesmoke;
   border-radius: 5px;
   margin-top: 20px;

@@ -1,6 +1,7 @@
 package com.example.presentation.restapi.signup;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -23,8 +24,8 @@ public class SignupActionIT extends ExampleChatRestTestBase {
         RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                 .setBody(Map.of("userName", userName, "mailAddress", mailAddress, "password", password));
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("post-signup", request, response);
     }
 
@@ -40,14 +41,22 @@ public class SignupActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                     .setBody(Map.of("userName", invalidUserName, "mailAddress", mailAddress, "password", password));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-signup", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                 .setBody(Map.of("mailAddress", mailAddress, "password", password));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-signup", response);
     }
 
     @Test
@@ -62,14 +71,22 @@ public class SignupActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                     .setBody(Map.of("userName", userName, "mailAddress", invalidMailaddress, "password", password));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-signup", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                 .setBody(Map.of("userName", userName, "password", password));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-signup", response);
     }
 
     @Test
@@ -84,13 +101,21 @@ public class SignupActionIT extends ExampleChatRestTestBase {
             RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                     .setBody(Map.of("userName", userName, "mailAddress", mailAddress, "password", invalidPassword));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-signup", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/signup").setContentType("application/json")
                 .setBody(Map.of("userName", userName, "mailAddress", mailAddress));
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-signup", response);
     }
 }

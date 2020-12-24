@@ -27,7 +27,7 @@ const Signup: React.FC = () => {
   const systemMessages = useSystemMessages();
   const { error, handleSubmit } = useValidation<FormFields>({
     userName: stringField()
-      .required(systemMessages('errors.required', 'ユーザ名')),
+      .required(systemMessages('errors.required', 'ユーザー名')),
     mailAddress: stringField()
       .required(systemMessages('errors.required', 'メールアドレス'))
       .email(systemMessages('errors.email')),
@@ -40,16 +40,13 @@ const Signup: React.FC = () => {
 
   const signup: React.FormEventHandler<HTMLFormElement> = async (event) => {
     setProcessing(true);
-    try {
-      const response = await BackendService.registerAccount(userName, mailAddress, password);
-      if (response === 'conflict')  {
-        setFormError(systemMessages('errors.conflict', 'ユーザ名'));
-        return;
-      }
-      history.push('/signup-mail');
-    } finally {
+    const response = await BackendService.registerAccount(userName, mailAddress, password);
+    if (response === 'conflict')  {
+      setFormError(systemMessages('errors.conflict', 'ユーザー名'));
       setProcessing(false);
+      return;
     }
+    history.push('/signup-mail');
   };
 
   return (

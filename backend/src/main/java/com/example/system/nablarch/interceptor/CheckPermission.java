@@ -6,12 +6,12 @@ import com.example.domain.model.channel.ChannelId;
 import com.example.infrastructure.persistence.entity.ChannelEntity;
 import com.example.infrastructure.persistence.entity.ChannelMemberEntity;
 import com.example.infrastructure.persistence.entity.ChannelOwnerEntity;
+import com.example.presentation.restapi.RestApiException;
 import nablarch.common.dao.NoDataException;
 import nablarch.common.dao.UniversalDao;
 import nablarch.core.ThreadContext;
 import nablarch.fw.ExecutionContext;
 import nablarch.fw.Interceptor;
-import nablarch.fw.web.HttpErrorResponse;
 import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.HttpResponse;
 
@@ -50,7 +50,7 @@ public @interface CheckPermission {
                 UniversalDao.findById(ChannelEntity.class, channelId.value());
             } catch (NoDataException e) {
                 // チャンネルが存在しない場合
-                throw new HttpErrorResponse(HttpResponse.Status.NOT_FOUND.getStatusCode());
+                throw new RestApiException(HttpResponse.Status.NOT_FOUND, "channel.notfound");
             }
 
             switch (annotation.value()) {

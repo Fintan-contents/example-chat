@@ -12,7 +12,7 @@ export default class StringFieldConstraint extends FieldConstraint<string> {
 
   minLength(length: number, message: string): StringFieldConstraint {
     return this.define((value) => {
-      if (value !== null && value !== '' && value.length < length) {
+      if (value !== null && value !== '' && [...value].length < length) {
         return message;
       }
     });
@@ -20,7 +20,7 @@ export default class StringFieldConstraint extends FieldConstraint<string> {
 
   maxLength(length: number, message: string): StringFieldConstraint {
     return this.define((value) => {
-      if (value !== null && value !== '' && value.length > length) {
+      if (value !== null && value !== '' && [...value].length > length) {
         return message;
       }
     });

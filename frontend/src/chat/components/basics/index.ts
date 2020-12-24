@@ -13,6 +13,7 @@ import { ValidationError } from './ValidationError';
 import { DateTime } from './DateTime';
 import { QRCode } from './QRCode';
 import { Spinner } from './Spinner';
+import { Modal } from './Modal';
 
 export {
   Input,
@@ -30,4 +31,5 @@ export {
   DateTime,
   QRCode,
   Spinner,
+  Modal,
 };

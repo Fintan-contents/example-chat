@@ -90,7 +90,7 @@ export class RestClient {
     return this.fetchWithRetry(baseUrl + input, init, 0)
       .then(response => {
         if (500 <= response.status && response.status <= 599) {
-          return Promise.reject();
+          return Promise.reject(response);
         }
         return response;
       })

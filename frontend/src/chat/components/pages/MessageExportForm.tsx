@@ -54,10 +54,10 @@ const MessageExportForm: React.FC = () => {
   return (
     <div>
       <nav className="MessageExportForm_nav">
-        <Title>#{channel.name}チャンネルのメッセージ履歴をエクスポートする</Title>
+        <Title>#{channel.name}のメッセージ履歴をエクスポートする</Title>
       </nav>
       <Form onSubmit={handleSubmit}>
-        <p>#{channel.name}チャンネルの全てのメッセージをCSV形式でエクスポートします。</p>
+        <p>#{channel.name}の全てのメッセージをCSV形式でエクスポートします。</p>
         <span className="MessageExportForm_buttonGroup">
           <Link to={'/channels/' + channelId + '/settings'}><Button>キャンセル</Button></Link>
           <PositiveButton type="submit" disabled={processing}>エクスポート</PositiveButton>

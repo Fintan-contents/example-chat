@@ -17,7 +17,7 @@ public class UserNameTest {
     @ValueSource(strings = { "testuser" })
     @MethodSource("justMaxlength")
     void validWith(String value) {
-        new UserName(value);
+        assertDoesNotThrow(() -> new UserName(value));
     }
 
     @Test
@@ -34,7 +34,8 @@ public class UserNameTest {
 
     static Stream<String> justMaxlength() {
         String text = IntStream.range(0, 50).mapToObj(i -> "x").collect(Collectors.joining());
-        return Stream.of(text);
+        String surrogatePair = "𩸽" + text.substring(1);
+        return Stream.of(text, surrogatePair);
     }
 
     static Stream<String> overMaxlength() {

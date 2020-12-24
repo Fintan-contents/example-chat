@@ -30,7 +30,12 @@ public class MyAccountActionIT extends ExampleChatRestTestBase {
     public void ログインしていない場合はアカウント情報を取得できない() {
         loadCsrfToken();
         RestMockHttpRequest request = get("/api/accounts/me");
+
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-accouunts", request, response);
     }
 }

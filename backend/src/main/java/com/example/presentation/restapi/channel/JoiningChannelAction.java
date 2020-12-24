@@ -6,10 +6,10 @@ import com.example.application.service.channel.ChatBotSearchService;
 import com.example.domain.model.account.AccountId;
 import com.example.domain.model.channel.ChannelId;
 import com.example.domain.model.channel.ChatBot;
+import com.example.presentation.restapi.RestApiException;
 import com.example.system.nablarch.interceptor.CheckPermission;
 import com.example.system.nablarch.interceptor.CheckPermission.Permission;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
-import nablarch.fw.web.HttpErrorResponse;
 import nablarch.fw.web.HttpRequest;
 import nablarch.fw.web.HttpResponse;
 
@@ -42,7 +42,7 @@ public class JoiningChannelAction {
 
         ChatBot chatBot = chatBotSearchService.findBy(accountId);
         if (chatBot.channelId().value().equals(channelId.value())) {
-            throw new HttpErrorResponse(HttpResponse.Status.FORBIDDEN.getStatusCode());
+            throw new RestApiException(HttpResponse.Status.FORBIDDEN, "access.denied");
         }
 
         channelMemberRegistrationService.delete(channelId, accountId);

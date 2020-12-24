@@ -1,7 +1,7 @@
 package com.example.application.service.account;
 
 import com.example.application.ApplicationConfig;
-import com.example.application.InvalidPasswordResetTokenException;
+import com.example.application.InvalidTokenException;
 import com.example.domain.model.notification.Mailer;
 import com.example.domain.model.notification.PasswordResetMail;
 import com.example.domain.repository.AccountPasswordRepository;
@@ -58,14 +58,14 @@ public class PasswordResetService {
     public void verifyToken(TemporaryUserToken userToken) {
         PasswordResettableAccount resettableAccount = resettableAccountRepository.findBy(userToken);
         if (resettableAccount == null) {
-            throw new InvalidPasswordResetTokenException();
+            throw new InvalidTokenException();
         }
     }
 
     public void resetPassword(TemporaryUserToken userToken, RawPassword newPassword) {
         PasswordResettableAccount resettableAccount = resettableAccountRepository.findBy(userToken);
         if (resettableAccount == null) {
-            throw new InvalidPasswordResetTokenException();
+            throw new InvalidTokenException();
         }
 
         AccountPassword accountPassword = passwordRepository.findById(resettableAccount.account().accountId());

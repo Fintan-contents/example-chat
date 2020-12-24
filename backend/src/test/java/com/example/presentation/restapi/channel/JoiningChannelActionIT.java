@@ -1,6 +1,7 @@
 package com.example.presentation.restapi.channel;
 
 import com.example.presentation.restapi.ExampleChatRestTestBase;
+import com.jayway.jsonassert.JsonAssert;
 import nablarch.fw.web.HttpResponse;
 import nablarch.fw.web.RestMockHttpRequest;
 import org.junit.Test;
@@ -15,8 +16,8 @@ public class JoiningChannelActionIT extends ExampleChatRestTestBase {
         Integer channelId = 1;
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("delete-channels-channelId-members-me", request, response);
 
         // チャンネルオーナーに影響が無いこと
@@ -31,44 +32,69 @@ public class JoiningChannelActionIT extends ExampleChatRestTestBase {
     public void ログインしていない場合はチャンネルを離脱できない() {
         loadCsrfToken();
         Integer channelId = 1;
+
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("delete-channels-channelId-members-me", request, response);
     }
 
     @Test
     public void 自分がオーナーのチャンネルは離脱できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 1;
+
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("delete-channels-channelId-members-me", request, response);
     }
 
     @Test
     public void ChatBotのチャンネルは離脱できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 2;
+
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("delete-channels-channelId-members-me", request, response);
     }
 
     @Test
     public void 参加していないチャンネルを離脱できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = 20001;
+
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("delete-channels-channelId-members-me", request, response);
     }
 
     @Test
     public void 存在しないチャンネルを離脱できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = Integer.MAX_VALUE;
+
         RestMockHttpRequest request = delete("/api/channels/" + channelId + "/members/me");
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("delete-channels-channelId-members-me", request, response);
     }
 }

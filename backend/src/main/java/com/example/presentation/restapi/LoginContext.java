@@ -29,6 +29,6 @@ public class LoginContext {
 
     public AccountId getAccountIdWaiting2fa() {
         String value = SessionUtil.orNull(executionContext, WAITING_2FA_SESSION_KEY);
-        return new AccountId(Long.parseLong(value));
+        return value == null ? null : new AccountId(Long.parseLong(value));
     }
 }

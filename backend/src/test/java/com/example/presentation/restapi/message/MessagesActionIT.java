@@ -77,9 +77,14 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
     @Test
     public void ログインしていない場合はメッセージの一覧を取得できない() {
         Integer channelId = 1;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/messages");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-messages", request, response);
     }
 
     @Test
@@ -89,16 +94,25 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
         Integer messageId = Integer.MAX_VALUE;
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/messages");
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("get-channels-channelId-messages", request, response);
     }
 
     @Test
     public void 存在しないチャンネルのメッセージ一覧は取得できない() throws Exception {
         login("user1@example.com", "pass123-");
         Integer channelId = Integer.MAX_VALUE;
+
         RestMockHttpRequest request = get("/api/channels/" + channelId + "/messages");
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("get-channels-channelId-messages", request, response);
     }
 
     @Test
@@ -110,14 +124,13 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("text", text));
         HttpResponse response = sendRequest(request);
-        assertEquals(204, response.getStatusCode());
 
+        assertEquals(204, response.getStatusCode());
         validateByOpenAPI("post-channels-channelId-messages", request, response);
 
         RestMockHttpRequest listRequest = get("/api/channels/" + channelId + "/messages");
         HttpResponse listResponse = sendRequest(listRequest);
         assertEquals(200, listResponse.getStatusCode());
-
         JsonAssert.with(listResponse.getBodyString())
                 .assertEquals("$.messages[0].text", text);
     }
@@ -156,14 +169,22 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
                     .setContentType("application/json")
                     .setBody(Map.of("text", invalidText));
             HttpResponse response = sendRequest(request);
+
             assertEquals(400, response.getStatusCode());
+            JsonAssert.with(response.getBodyString())
+                    .assertEquals("$.code", "request");
+            validateByOpenAPI("post-channels-channelId-messages", request, response);
         });
 
         // 項目として送信しないケース
         RestMockHttpRequest request = post("/api/channels/" + channelId + "/messages")
                 .setContentType("application/json");
         HttpResponse response = sendRequest(request);
+
         assertEquals(400, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "request");
+        validateByOpenAPI("post-channels-channelId-messages", response);
     }
 
     @Test
@@ -175,7 +196,11 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("text", text));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("post-channels-channelId-messages", request, response);
     }
 
     @Test
@@ -187,7 +212,11 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("text", text));
         HttpResponse response = sendRequest(request);
+
         assertEquals(403, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "access.denied");
+        validateByOpenAPI("post-channels-channelId-messages", request, response);
     }
 
     @Test
@@ -199,6 +228,10 @@ public class MessagesActionIT extends ExampleChatRestTestBase {
                 .setContentType("application/json")
                 .setBody(Map.of("text", text));
         HttpResponse response = sendRequest(request);
+
         assertEquals(404, response.getStatusCode());
+        JsonAssert.with(response.getBodyString())
+                .assertEquals("$.code", "channel.notfound");
+        validateByOpenAPI("post-channels-channelId-messages", request, response);
     }
 }
