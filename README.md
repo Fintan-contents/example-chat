@@ -129,7 +129,20 @@ Hit <enter> to redeploy:
 
 REST APIをローカルで動かす場合、Dockerコンテナで起動することもできます。
 
-まず、次のコマンドでDockerイメージを作成します。Dockerイメージの名前は`example-chat-backend`になります。
+そのままDockerイメージを作成すると`SameSite`属性が`None`に設定されるようになっていますので、Cookieを送信するには`Secure`属性をつける必要があり、HTTPS通信でなければCookieを送信することができなくなります。
+
+ローカルでHTTP通信を使用して動作させたい場合は、Dockerイメージの作成前に、`SameSite`属性が`Lax`になるように設定を変更しておきます。
+
+`backend/src/main/jib/usr/local/tomcat/conf/context.xml`ファイルを開き、`CookieProcessor`の`sameSiteCookies`属性の値を`lax`に変更します。
+
+```xml
+<Context>
+  ...
+  <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor" sameSiteCookies="lax"/>
+</Context>
+```
+
+Dockerイメージは次のコマンドで作成します。Dockerイメージの名前は`example-chat-backend`になります。
 
 ```
 $ # backendディレクトリで実行してください

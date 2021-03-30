@@ -1,15 +1,15 @@
-.Channel_layout {
+.Chat_layout {
   margin: 0;
   height: 100vh;
   display: grid;
   grid-template-columns: 220px 1fr;
   grid-template-rows: 60px 1fr 120px;
 }
-.Channel_layout a {
+.Chat_layout a {
   text-decoration: none;
 }
 
-.Channel_detail {
+.Chat_channel-detail {
   grid-column: 4;
   grid-row: 1 / 4;
   border-left: solid thin lightgray;
@@ -17,10 +17,10 @@
   overflow: auto;
 }
 
-.Channel_detail-shown {
+.Chat_channel-detail-shown {
   display: block;
 }
 
-.Channel_detail-hidden {
+.Chat_channel-detail-hidden {
   display: none;
 }

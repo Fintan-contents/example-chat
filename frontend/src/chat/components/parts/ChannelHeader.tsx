@@ -12,10 +12,9 @@ interface Channel {
 type ChannelHeaderProps = {
   channel: Channel;
   showDetail: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  logout: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
-export const ChannelHeader: React.FC<ChannelHeaderProps> = ({channel,showDetail, logout}) => {
+export const ChannelHeader: React.FC<ChannelHeaderProps> = ({channel,showDetail}) => {
   return (
     <div className="ChannelHeader_header">
       <h3>{'#' + channel.name}</h3>
@@ -24,7 +23,6 @@ export const ChannelHeader: React.FC<ChannelHeaderProps> = ({channel,showDetail,
           <li><button className="ChannelHeader_linkButton" onClick={showDetail}>チャンネル参加者</button></li>
           <li><Link to={'/channels/' + channel.id + '/settings'}>チャンネル設定</Link></li>
           <li><Link to={'/account_settings'}>アカウント設定</Link></li>
-          <li><button className="ChannelHeader_linkButton" onClick={logout}>ログアウト</button></li>
         </ul>
       </nav>
     </div>

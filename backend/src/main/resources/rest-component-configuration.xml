@@ -122,7 +122,6 @@
       <component class="com.example.system.nablarch.handler.csrf.CsrfTokenVerificationFailureHandler"/>
     </property>
   </component>
-  <component name="csrfTokenEndpointHandler" class="com.example.system.nablarch.handler.csrf.CsrfTokenEndpointHandler" />
 
   <!-- CORS設定 -->
   <component name="cors" class="nablarch.fw.jaxrs.cors.BasicCors">
@@ -177,7 +176,7 @@
         <!-- セキュリティ関連のレスポンスヘッダを設定するため追加 -->
         <component class="nablarch.fw.web.handler.SecureHandler" />
 
-        <!-- 
+        <!--
         マルチパートリクエストハンドラはリクエストボディをパースしてファイルへ保存を行う。
         CSRFを防ぐためにはCSRFトークンの検証後にマルチパートリクエストハンドラが実行される必要がある。
         CSRFトークン検証ハンドラはセッションストアを使用しているためセッション変数保存ハンドラの後に実行される必要がある。
@@ -210,12 +209,6 @@
 
         <!-- CSRFトークンの発行や検証を行うために追加 -->
         <component-ref name="csrfTokenVerificationHandler"/>
-
-        <!-- CSRFトークン取得APIのエンドポイント -->
-        <component class="nablarch.fw.RequestHandlerEntry">
-          <property name="requestPattern" value="/api/csrf_token" />
-          <property name="handler" ref="csrfTokenEndpointHandler" />
-        </component>
 
         <!-- ファイルアップロード用に追加 -->
         <component class="com.example.system.nablarch.handler.MultipartErrorHandler">

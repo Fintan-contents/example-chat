@@ -1,10 +1,9 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import { BackendService } from 'chat/backend';
 import { NotificationService, Logger, usePageTitle } from 'framework';
 import { ChannelDetail, ChannelContent, ChannelHeader, ChannelSideBar, Loading } from 'chat/components/parts';
-import LoginContext from 'chat/context/LoginContext';
 import {useHistory, useParams} from 'react-router-dom';
-import './Channel.css';
+import './Chat.css';
 
 interface Channel {
   id: number;
@@ -13,8 +12,7 @@ interface Channel {
   type: string;
   allRead: boolean;
 }
-const Channel: React.FC = () => {
-  const loginContext = useContext(LoginContext);
+const Chat: React.FC = () => {
   const history = useHistory();
   const {channelId} = useParams<{channelId: string}>();
 
@@ -60,11 +58,6 @@ const Channel: React.FC = () => {
   const handleShowDetail: React.MouseEventHandler<HTMLButtonElement> = () => {
     setShowDetail(!showDetail);
   };
-  const handleLogout: React.MouseEventHandler<HTMLButtonElement> = () => {
-    loginContext.logout().then(() => {
-      history.push('/');
-    });
-  };
 
   useEffect(() => {
     updateChannels();
@@ -107,9 +100,9 @@ const Channel: React.FC = () => {
   }
 
   return (
-    <div className="Channel_layout">
+    <div className="Chat_layout">
       <ChannelSideBar channels={channels} selectedChannel={selectedChannel} selectChannel={selectChannel}/>
-      <ChannelHeader channel={selectedChannel} showDetail={handleShowDetail} logout={handleLogout}/>
+      <ChannelHeader channel={selectedChannel} showDetail={handleShowDetail}/>
       <ChannelContentBridge channelId={selectedChannel.id} postMessage={postMessage} uploadFile={uploadFile}/>
       <ChannelDetailBridge channelId={selectedChannel.id} showDetail={showDetail} setShowDetail={setShowDetail}/>
     </div>
@@ -213,11 +206,11 @@ const ChannelDetailBridge: React.FC<{ showDetail: boolean; setShowDetail: (b: bo
   }, [channelId]);
 
   return (
-    <div className={`Channel_detail ${showDetail ? 'Channel_detail-shown' : 'Channel_detail-hidden'}`}>
+    <div className={`Chat_channel-detail ${showDetail ? 'Chat_channel-detail-shown' : 'Chat_channel-detail-hidden'}`}>
       {members ? <ChannelDetail channelId={channelId} setShowDetail={setShowDetail} members={members}/> :
         <Loading />}
     </div>
   );
 };
 
-export default Channel;
+export default Chat;

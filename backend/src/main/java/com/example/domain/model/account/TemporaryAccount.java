@@ -1,7 +1,5 @@
 package com.example.domain.model.account;
 
-import java.util.concurrent.TimeUnit;
-
 public class TemporaryAccount {
 
     private final TemporaryUserToken userToken;
@@ -12,15 +10,12 @@ public class TemporaryAccount {
 
     private final HashedPassword password;
 
-    private final ExpireTime expireTime;
-
     public TemporaryAccount(TemporaryUserToken userToken, UserName userName, MailAddress mailAddress,
             HashedPassword password) {
         this.userToken = userToken;
         this.userName = userName;
         this.mailAddress = mailAddress;
         this.password = password;
-        this.expireTime = new ExpireTime(24, TimeUnit.HOURS);
     }
 
     public TemporaryUserToken temporaryUserToken() {
@@ -37,9 +32,5 @@ public class TemporaryAccount {
 
     public HashedPassword password() {
         return password;
-    }
-
-    public ExpireTime expireTime() {
-        return expireTime;
     }
 }

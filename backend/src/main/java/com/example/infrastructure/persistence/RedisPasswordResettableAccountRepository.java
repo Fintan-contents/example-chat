@@ -1,6 +1,7 @@
 package com.example.infrastructure.persistence;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.example.domain.model.account.Account;
 import com.example.domain.model.account.AccountId;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nablarch.core.repository.di.config.externalize.annotation.ComponentRef;
+import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 import nablarch.integration.redisstore.lettuce.LettuceRedisClient;
 
@@ -21,10 +23,14 @@ public class RedisPasswordResettableAccountRepository implements PasswordResetta
 
     private final LettuceRedisClient redisClient;
 
+    private final long expireMilliseconds;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public RedisPasswordResettableAccountRepository(@ComponentRef("lettuceRedisClientProvider") LettuceRedisClient redisClient) {
+    public RedisPasswordResettableAccountRepository(@ComponentRef("lettuceRedisClientProvider") LettuceRedisClient redisClient,
+                                                    @ConfigValue("${passwordReset.verification.expire}") String expireSeconds) {
         this.redisClient = redisClient;
+        this.expireMilliseconds = TimeUnit.SECONDS.toMillis(Long.parseLong(expireSeconds));
     }
 
     @Override
@@ -33,7 +39,7 @@ public class RedisPasswordResettableAccountRepository implements PasswordResetta
         byte[] value = serialize(resettableAccount.account());
 
         redisClient.set(key, value);
-        redisClient.pexpire(key, resettableAccount.expireTime().toSecond());
+        redisClient.pexpire(key, expireMilliseconds);
     }
 
     @Override

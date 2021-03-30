@@ -19,8 +19,8 @@ import javax.websocket.Session;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
-import org.eclipse.jetty.websocket.javax.server.internal.JavaxWebSocketServerContainer;
+import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,9 +49,10 @@ public class ExampleChatNotifierIT {
         context.setBaseResource(Resource.newResource("src/main/webapp"));
         server = new Server(9081);
         server.setHandler(context);
-        JavaxWebSocketServerContainer javaxWebSocketServerContainer = JavaxWebSocketServletContainerInitializer
-                .initialize(context);
-        javaxWebSocketServerContainer.addEndpoint(WebSocketEndpoint.class);
+
+        ServerContainer serverContainer = WebSocketServerContainerInitializer.configureContext(context);
+        serverContainer.addEndpoint(WebSocketEndpoint.class);
+
         server.start();
 
         RedisClient redisClient = SystemRepository.get("redisClient");

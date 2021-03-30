@@ -1,7 +1,7 @@
 import AccountDeletion from './AccountDeletion';
 import AccountSettings from './AccountSettings';
-import Channel from './Channel';
-import ChannelTop from './ChannelTop';
+import Chat from './Chat';
+import ChannelRouting from './ChannelRouting';
 import ChannelCreate from './ChannelCreate';
 import ChannelDelete from './ChannelDelete';
 import ChannelLeave from './ChannelLeave';
@@ -26,8 +26,8 @@ import TwoFactorAuthenticationSetting from './TwoFactorAuthenticationSetting';
 export {
   AccountDeletion ,
   AccountSettings ,
-  Channel ,
-  ChannelTop ,
+  Chat ,
+  ChannelRouting ,
   ChannelCreate ,
   ChannelDelete ,
   ChannelLeave ,

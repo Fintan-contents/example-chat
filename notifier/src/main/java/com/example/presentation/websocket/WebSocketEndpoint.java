@@ -125,6 +125,10 @@ public class WebSocketEndpoint implements Disposable {
 
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
+        if (!notifiers.containsKey(session)) {
+            // 認証トークンが不正である等の理由により、管理対象になっていないセッションがクローズされた場合は何もしない
+            return;
+        }
         WebSocketNotifier notifier = notifiers.remove(session);
         AccountId accountId = notifier.accountId();
         notifierManager.remove(accountId, notifier);

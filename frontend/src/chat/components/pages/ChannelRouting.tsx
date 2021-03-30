@@ -11,12 +11,13 @@ interface Channel {
   type: string;
   allRead: boolean;
 }
-const ChannelTop: React.FC = () => {
+
+const ChannelRouting: React.FC = () => {
   const history = useHistory();
 
-  usePageTitle('チャンネルTop');
+  usePageTitle('チャンネル移動');
 
-  Logger.debug('rendering ChannelTop...');
+  Logger.debug('rendering ChannelRouting...');
 
   useEffect(() => {
     BackendService.findAllChannel()
@@ -37,4 +38,4 @@ const ChannelTop: React.FC = () => {
   return <Loading />;
 };
 
-export default ChannelTop;
+export default ChannelRouting;

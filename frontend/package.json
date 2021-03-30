@@ -3,23 +3,25 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.28",
-    "@fortawesome/free-solid-svg-icons": "^5.13.0",
-    "@fortawesome/react-fontawesome": "^0.1.9",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.34",
-    "@types/react": "^16.9.31",
-    "@types/react-dom": "^16.9.6",
-    "@zxing/library": "^0.17.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^12.20.6",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.2",
+    "@types/react-router-dom": "^5.1.7",
+    "@zxing/library": "^0.18.4",
     "moment": "^2.26.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
-    "typescript": "^3.8.3"
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.2.3",
+    "web-vitals": "^1.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -32,7 +34,8 @@
   "//": "ESLintのrulesについてはプロジェクトごとに設定してください（不要の場合は削除してください）",
   "eslintConfig": {
     "extends": [
-      "react-app"
+      "react-app",
+      "react-app/jest"
     ],
     "ignorePatterns": [
       "*.css"
@@ -69,8 +72,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.3",
-    "jest-junit": "^10.0.0"
+    "jest-junit": "^12.0.0"
   },
   "jest": {
     "globalSetup": "./setup.js"

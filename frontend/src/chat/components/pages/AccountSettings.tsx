@@ -18,6 +18,11 @@ const AccountSettings: React.FC = () => {
         </div>
       </nav>
       <ul className="AccountSettings_list">
+        <Link to={'/logout'}>
+          <li className="AccountSettings_item">
+            <h2 className="AccountSettings_title">ログアウトする</h2>
+          </li>
+        </Link>
         <Link to={'/two-factor-authentication-setting'}>
           <li className="AccountSettings_item">
             <h2 className="AccountSettings_title">2要素認証を設定する</h2>

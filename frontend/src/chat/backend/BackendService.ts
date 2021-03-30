@@ -444,7 +444,7 @@ const getNotificationUrl = async () => {
   throw new WebApiError(response.status);
 };
 
-export default {
+const backendService = {
   registerAccount,
   verifyAccount,
   login,
@@ -481,3 +481,5 @@ export default {
   setCsrfTokenValue,
   getCsrfToken,
 };
+
+export default backendService;

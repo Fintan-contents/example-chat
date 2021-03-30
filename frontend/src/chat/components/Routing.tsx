@@ -4,8 +4,8 @@ import {
   Signup,
   SignupMail,
   SignupComplete,
-  Channel,
-  ChannelTop,
+  Chat,
+  ChannelRouting,
   Top,
   LoginForm,
   ChannelSettings,
@@ -28,6 +28,7 @@ import {
 import LoginContext from 'chat/context/LoginContext';
 import { RouteProps } from 'react-router';
 import {PageHeader} from './parts';
+import Logout from './pages/Logout';
 
 /**
  * ルーティングには、React Router(https://reacttraining.com/react-router/web/guides/quick-start) を使用する。
@@ -97,10 +98,13 @@ const Routing: React.FC = () => {
           <ChannelSettings/>
         </ProtectedRoute>
         <ProtectedRoute exact path="/channels/top">
-          <ChannelTop/>
+          <ChannelRouting/>
         </ProtectedRoute>
         <ProtectedRoute exact path="/channels/:channelId">
-          <Channel/>
+          <Chat/>
+        </ProtectedRoute>
+        <ProtectedRoute exact path="/logout">
+          <Logout/>
         </ProtectedRoute>
         <ForAnonymousRoute exact path="/password-reset/:token">
           <PasswordResetForm/>

@@ -27,4 +27,8 @@ public class EventListenerRegister implements ServletContextListener {
             publisher.addEventListener(listener);
         }
     }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+    }
 }

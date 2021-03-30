@@ -22,11 +22,9 @@ import javax.websocket.Session;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.javax.server.config.JavaxWebSocketServletContainerInitializer;
-import org.eclipse.jetty.websocket.javax.server.internal.JavaxWebSocketServerContainer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
+import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -45,11 +43,11 @@ public class WebSocketEndpointIT {
     private static final long TIMEOUT_VALUE = 100;
     private static final TimeUnit TIMEOUT_UNIT = TimeUnit.MILLISECONDS;
 
-    private Server server;
-    private WebSocketEndpoint sut;
+    private static Server server;
+    private static WebSocketEndpoint sut;
 
-    @BeforeEach
-    void init() throws Exception {
+    @BeforeAll
+    static void init() throws Exception {
         NotifierManager notifierManager = new NotifierManager();
         AuthenticationTokenRepository authenticationTokenRepository = new MockAuthenticationTokenRepository()
                 .add("token1", "account1")
@@ -64,15 +62,18 @@ public class WebSocketEndpointIT {
         context.setBaseResource(Resource.newResource("src/test/resources/war"));
         server = new Server(9081);
         server.setHandler(context);
-        JavaxWebSocketServerContainer javaxWebSocketServerContainer = JavaxWebSocketServletContainerInitializer
-                .initialize(context);
-        javaxWebSocketServerContainer.addEndpoint(WebSocketEndpoint.class);
+
+        ServerContainer serverContainer = WebSocketServerContainerInitializer.configureContext(context);
+        serverContainer.addEndpoint(WebSocketEndpoint.class);
+
         server.start();
     }
 
-    @AfterEach
-    void destroy() throws Exception {
-        server.stop();
+    @AfterAll
+    static void destroy() throws Exception {
+        if (server != null) {
+            server.stop();
+        }
     }
 
     @ParameterizedTest
@@ -92,7 +93,6 @@ public class WebSocketEndpointIT {
                 URI.create("ws://localhost:9081/notification?token=unknowntoken"))) {
             assertEquals(CloseCodes.NORMAL_CLOSURE, client.getCloseReason().getCloseCode());
             assertEquals("Authentication failed", client.getCloseReason().getReasonPhrase());
-            assertFalse(session.isOpen());
         }
     }
 
@@ -103,7 +103,6 @@ public class WebSocketEndpointIT {
                 URI.create("ws://localhost:9081/notification?token="))) {
             assertEquals(CloseCodes.NORMAL_CLOSURE, client.getCloseReason().getCloseCode());
             assertEquals("Authentication failed", client.getCloseReason().getReasonPhrase());
-            assertFalse(session.isOpen());
         }
     }
 
@@ -114,7 +113,6 @@ public class WebSocketEndpointIT {
                 URI.create("ws://localhost:9081/notification"))) {
             assertEquals(CloseCodes.NORMAL_CLOSURE, client.getCloseReason().getCloseCode());
             assertEquals("Authentication failed", client.getCloseReason().getReasonPhrase());
-            assertFalse(session.isOpen());
         }
     }
 

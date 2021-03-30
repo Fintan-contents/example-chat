@@ -1,6 +1,7 @@
 package com.example.infrastructure.persistence;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.example.domain.model.account.HashedPassword;
 import com.example.domain.model.account.MailAddress;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nablarch.core.repository.di.config.externalize.annotation.ComponentRef;
+import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
 import nablarch.integration.redisstore.lettuce.LettuceRedisClient;
 
@@ -20,10 +22,14 @@ public class RedisDataSource implements TemporaryAccountRepository {
 
     private final LettuceRedisClient redisClient;
 
+    private final long expireMilliseconds;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public RedisDataSource(@ComponentRef("lettuceRedisClientProvider") LettuceRedisClient redisClient) {
+    public RedisDataSource(@ComponentRef("lettuceRedisClientProvider") LettuceRedisClient redisClient,
+                           @ConfigValue("${signup.verification.expire}") String expireSeconds) {
         this.redisClient = redisClient;
+        this.expireMilliseconds = TimeUnit.SECONDS.toMillis(Long.parseLong(expireSeconds));
     }
 
     @Override
@@ -32,7 +38,7 @@ public class RedisDataSource implements TemporaryAccountRepository {
         byte[] jsonString = serialize(temporaryAccount);
 
         redisClient.set(key, jsonString);
-        redisClient.pexpire(key, temporaryAccount.expireTime().toSecond());
+        redisClient.pexpire(key, expireMilliseconds);
     }
 
     @Override
