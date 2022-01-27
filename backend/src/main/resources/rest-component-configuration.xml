@@ -19,6 +19,9 @@
   <!-- セッションストア機能 -->
   <import file="nablarch/webui/redisstore-lettuce.xml" />
 
+  <!-- プロパティファイルによるメッセージ管理機能の設定 -->
+  <import file="nablarch/core/message-by-property-files.xml" />
+
   <!-- 環境設定ファイル -->
   <config-file file="nablarch/webui/redisstore-lettuce.config" />
   <config-file file="common.config" />
@@ -230,6 +233,7 @@
   <component name="initializer" class="nablarch.core.repository.initialization.BasicApplicationInitializer">
     <property name="initializeList">
       <list>
+        <component-ref name="stringResourceCache" />
         <component-ref name="packageMapping" />
         <component-ref name="dbMigration" />
         <component-ref name="lettuceRedisClientProvider"/>
