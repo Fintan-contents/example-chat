@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import {
   Signup,
   SignupMail,
@@ -52,7 +52,7 @@ const Routing: React.FC = () => {
     '/',
   ];
   return (
-    <Router>
+    <>
       <Route exact path={usingPageHeaderPaths}>
         <PageHeader/>
       </Route>
@@ -131,7 +131,7 @@ const Routing: React.FC = () => {
           <Top />
         </Route>
       </Switch>
-    </Router>
+    </>
   );
 };
 
