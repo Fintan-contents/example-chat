@@ -1,4 +1,4 @@
-function debug(message?: any, ...optionalParams: any[]): void {
+export function debug(message?: any, ...optionalParams: any[]): void {
 }
 
 const Logger = {
