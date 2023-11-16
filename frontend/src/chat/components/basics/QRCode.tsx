@@ -13,10 +13,10 @@ export const QRCode: React.FC<QRCodeProps> = ({ input, width, height }) => {
     if (ref.current !== null && input !== '') {
       const codeWriter = new BrowserQRCodeSvgWriter();
       const svg = codeWriter.write(input, width, height);
-      if (ref.current?.firstChild) {
-        ref.current?.replaceChild(svg, ref.current?.firstChild);
+      if (ref.current.firstChild) {
+        ref.current.replaceChild(svg, ref.current.firstChild);
       } else {
-        ref.current?.appendChild(svg);
+        ref.current.appendChild(svg);
       }
     }
   }, [input, height, width]);
