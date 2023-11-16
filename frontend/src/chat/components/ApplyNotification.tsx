@@ -12,10 +12,12 @@ const ApplyNotification: React.FC<Props> = ({ children }) => {
   const { isLogin } = useContext(LoginContext);
 
   useEffect(() => {
-    BackendService.getNotificationUrl().then((response) => {
-      setWebsocketUri(response.websocketUri);
-    });
-  }, []);
+    if (isLogin) {
+      BackendService.getNotificationUrl().then((response) => {
+        setWebsocketUri(response.websocketUri);
+      });
+    }
+  }, [isLogin]);
 
   useEffect(() => {
     if (isLogin) {
