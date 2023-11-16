@@ -14,6 +14,9 @@ export const QRCode: React.FC<QRCodeProps> = ({ input, width, height }) => {
       const codeWriter = new BrowserQRCodeSvgWriter();
       codeWriter.writeToDom(ref.current, input, width, height);
     }
+    return () => {
+      ref.current = null;
+    };
   }, [input, height, width]);
   return (
     <div ref={ref}></div>
