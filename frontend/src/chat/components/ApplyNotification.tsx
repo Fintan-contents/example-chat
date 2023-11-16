@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { NotificationService } from 'framework';
 import LoginContext from 'chat/context/LoginContext';
 import { BackendService } from 'chat/backend';
@@ -8,19 +8,27 @@ type Props = {
 }
 
 const ApplyNotification: React.FC<Props> = ({ children }) => {
+  const [websocketUri, setWebsocketUri] = useState();
   const { isLogin } = useContext(LoginContext);
+
+  useEffect(() => {
+    BackendService.getNotificationUrl().then((response) => {
+      setWebsocketUri(response.websocketUri);
+    });
+  }, []);
+
   useEffect(() => {
     if (isLogin) {
-      const urlSupplier = async () => {
-        const { websocketUri } = await BackendService.getNotificationUrl();
-        return websocketUri;
-      };
-      NotificationService.connect(urlSupplier);
+      if (websocketUri) {
+        NotificationService.connect(websocketUri);
+      }
       return () => {
-        NotificationService.disconnect();
+        if (websocketUri) {
+          NotificationService.disconnect();
+        }
       };
     }
-  }, [isLogin]);
+  }, [isLogin, websocketUri]);
   return (
     <React.Fragment>
       {React.Children.only(children)}

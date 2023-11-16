@@ -39,16 +39,14 @@ class NotificationService {
   private decode: (text: string) => any = JSON.parse;
   private encode: (value: any) => string = JSON.stringify;
 
-  connect(urlSupplier: () => Promise<string>): void {
+  connect(websocketUri: string): void {
     Logger.debug('Connect WebSocket');
     this.active = true;
-    this.init(urlSupplier);
+    this.init(websocketUri);
   }
 
-  private async init(urlSupplier: () => Promise<string>): Promise<void> {
-    const url = await urlSupplier();
-
-    const ws = new WebSocket(url);
+  private init(websocketUri: string): void {
+    const ws = new WebSocket(websocketUri);
     ws.onopen = (event: Event) => {
       this.pinger = this.schedulePing();
     };
@@ -62,7 +60,7 @@ class NotificationService {
       this.destroy();
       // ネットワークの問題などで切断された場合、active = trueのままなので再接続をスケジュールする
       if (this.active) {
-        this.reconnector = this.scheduleReconnect(urlSupplier);
+        this.reconnector = this.scheduleReconnect(websocketUri);
       }
     };
     this.webSocket = ws;
@@ -78,11 +76,11 @@ class NotificationService {
     }, this.heartbeatInSeconds * 1000);
   }
 
-  private scheduleReconnect(urlSupplier: () => Promise<string>): number {
+  private scheduleReconnect(websocketUri: string): number {
     return window.setTimeout(() => {
       Logger.debug('Reconnect WebSocket');
       this.reconnector = undefined;
-      this.init(urlSupplier);
+      this.init(websocketUri);
     }, this.reconnectDelayInSeconds * 1000);
   }
 
