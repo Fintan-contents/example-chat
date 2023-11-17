@@ -54,15 +54,8 @@ describe('rest client', () => {
     const sut = new RestClient();
 
     const promise = sut.get('api call');
-    
-    let errorResponse: any;
 
-    try {
-      await promise;
-    } catch (error) {
-      errorResponse = error;
-    }
-    expect(errorResponse.status).toBe(501);
+    await expect(promise).rejects.toEqual({status: 501});
   });
 
   test('リトライが5回を超えたらエラーレスポンスをそのまま返す', async () => {
@@ -70,15 +63,8 @@ describe('rest client', () => {
     const sut = new RestClient();
 
     const promise = sut.get('api call');
-    
-    let errorResponse: any;
 
-    try {
-      await promise;
-    } catch (error) {
-      errorResponse = error;
-    }
-    expect(errorResponse.status).toBe(500);
+    await expect(promise).rejects.toEqual({status: 500});
     expect(mockFetch.mock.calls.length).toBe(6);
   });
 
