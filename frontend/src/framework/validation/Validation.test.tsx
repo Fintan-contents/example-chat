@@ -4,7 +4,7 @@ import { stringField } from './field/StringFieldConstraint';
 import { stringArrayField } from './field/StringArrayFieldConstraint';
 import { numberField } from './field/NumberFieldConstraint';
 import '@testing-library/jest-dom/extend-expect';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 
 type Field = {
   str: string;
@@ -37,11 +37,11 @@ const Validation: React.FC<Field> = (props: Field) => {
     <React.Fragment>
       <button data-testid='validate' onClick={validate}/>
       <ul>
-        <li id='str'>{error.str ? error.str : 'OK'}</li>
-        <li id='num'>{error.num ? error.num : 'OK'}</li>
-        <li id='email'>{error.email ? error.email : 'OK'}</li>
-        <li id='array'>{error.array ? error.array : 'OK'}</li>
-        <li id='custom'>{error.custom ? error.custom : 'OK'}</li>
+        <li data-testid='str'>{error.str ? error.str : 'OK'}</li>
+        <li data-testid='num'>{error.num ? error.num : 'OK'}</li>
+        <li data-testid='email'>{error.email ? error.email : 'OK'}</li>
+        <li data-testid='array'>{error.array ? error.array : 'OK'}</li>
+        <li data-testid='custom'>{error.custom ? error.custom : 'OK'}</li>
       </ul>
     </React.Fragment>
   );
@@ -58,25 +58,25 @@ describe('useValidation', () => {
       array: ['test'],
       custom: 'no error',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('OK');
 
-    const num = component.container.querySelector('#num');
+    const num = screen.getByTestId('num');
     expect(num).toHaveTextContent('OK');
 
-    const email = component.container.querySelector('#email');
+    const email = screen.getByTestId('email');
     expect(email).toHaveTextContent('OK');
 
-    const array = component.container.querySelector('#array');
+    const array = screen.getByTestId('array');
     expect(array).toHaveTextContent('OK');
 
-    const custom = component.container.querySelector('#custom');
+    const custom = screen.getByTestId('custom');
     expect(custom).toHaveTextContent('OK');
 
   });
@@ -90,25 +90,25 @@ describe('useValidation', () => {
       array: [],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('missing');
 
-    const num = component.container.querySelector('#num');
+    const num = screen.getByTestId('num');
     expect(num).toHaveTextContent('missing');
 
-    const email = component.container.querySelector('#email');
+    const email = screen.getByTestId('email');
     expect(email).toHaveTextContent('OK');
 
-    const array = component.container.querySelector('#array');
+    const array = screen.getByTestId('array');
     expect(array).toHaveTextContent('missing');
 
-    const custom = component.container.querySelector('#custom');
+    const custom = screen.getByTestId('custom');
     expect(custom).toHaveTextContent('OK');
   });
 
@@ -121,13 +121,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('short');
   });
 
@@ -140,13 +140,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('long');
   });
 
@@ -159,13 +159,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('OK');
   });
 
@@ -178,13 +178,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('OK');
   });
 
@@ -197,13 +197,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('long');
   });
 
@@ -216,13 +216,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: '',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const str = component.container.querySelector('#str');
+    const str = screen.getByTestId('str');
     expect(str).toHaveTextContent('long');
   });
 
@@ -235,13 +235,13 @@ describe('useValidation', () => {
       array: ['test'],
       custom: 'no error',
     };
-    const component = render(
+    render(
       <Validation {...value} />
     );
 
-    fireEvent.click(component.getByTestId('validate'));
+    fireEvent.click(screen.getByTestId('validate'));
 
-    const email = component.container.querySelector('#email');
+    const email = screen.getByTestId('email');
     expect(email).toHaveTextContent('invalid format');
   });
 });

@@ -49,15 +49,20 @@ describe('rest client', () => {
     });
   });
 
-  test('レスポンスのステータスコードが501ならリトライしない', () => {
+  test('レスポンスのステータスコードが501ならリトライしない', async () => {
     mockFetch.mockImplementationOnce(() => Promise.resolve({status: 501} as Response));
     const sut = new RestClient();
 
     const promise = sut.get('api call');
+    
+    let error: any;
 
-    return promise.catch(response => {
-      expect(response.status).toBe(501);
-    });
+    try {
+      await promise;
+    } catch (response) {
+      error = response;
+    }
+    expect(error.status).toBe(501);
   });
 
   test('リトライが5回を超えたらエラーレスポンスをそのまま返す', async () => {
@@ -65,11 +70,16 @@ describe('rest client', () => {
     const sut = new RestClient();
 
     const promise = sut.get('api call');
+    
+    let error: any;
 
-    return promise.catch(response => {
-      expect(response.status).toBe(500);
-      expect(mockFetch.mock.calls.length).toBe(6);
-    });
+    try {
+      await promise;
+    } catch (response) {
+      error = response;
+    }
+    expect(error.status).toBe(500);
+    expect(mockFetch.mock.calls.length).toBe(6);
   });
 
 });
