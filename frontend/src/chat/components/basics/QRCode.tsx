@@ -12,7 +12,12 @@ export const QRCode: React.FC<QRCodeProps> = ({ input, width, height }) => {
   useEffect(() => {
     if (ref.current !== null && input !== '') {
       const codeWriter = new BrowserQRCodeSvgWriter();
-      codeWriter.writeToDom(ref.current, input, width, height);
+      const svg = codeWriter.write(input, width, height);
+      if (ref.current.firstChild) {
+        ref.current.replaceChild(svg, ref.current.firstChild);
+      } else {
+        ref.current.appendChild(svg);
+      }
     }
   }, [input, height, width]);
   return (

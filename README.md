@@ -32,7 +32,7 @@ GitHub上でソースコードを見て頂いたり、`git clone`をしてロー
 
 本アプリケーションの開発には次のソフトウェアを使用しています。
 
-- [Node v12.16](https://nodejs.org/ja/)
+- [Node v20.9.0](https://nodejs.org/ja/)
 - [Java 11(AdoptOpenJDK HotSpot)](https://adoptopenjdk.net/)
 - [Maven 3.6](https://maven.apache.org/)
 - [Docker 19.03, Docker Compose 1.26](https://www.docker.com/)
