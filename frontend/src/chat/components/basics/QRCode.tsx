@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { BrowserQRCodeSvgWriter } from '@zxing/library';
+import { BrowserQRCodeSvgWriter } from '@zxing/browser';
 
 type QRCodeProps = {
   input: string;

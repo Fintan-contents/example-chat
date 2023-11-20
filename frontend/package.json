@@ -6,7 +6,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@zxing/library": "^0.18.4",
+    "@zxing/browser": "^0.1.4",
     "moment": "^2.26.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
