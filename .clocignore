@@ -1,0 +1,12 @@
+########################################################
+# cloc によるコード行数カウントの除外path
+# 使い方
+# cloc [path] --exclude-list-file=.clocignore --vcs=git
+# ※ "--vcs=git" オプションを使うことで .gitignore が考慮されるので、gitignoreしているものは書く必要はない
+
+## 参考: https://github.com/AlDanial/cloc/issues/49
+########################################################
+
+
+# 100%見ない訳では無いが、これを含めると大きくなりすぎる
+frontend/package-lock.json
