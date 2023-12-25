@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import {BrowserRouter as Router, Redirect, Route, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import {
   Signup,
   SignupMail,
@@ -31,11 +31,11 @@ import {PageHeader} from './parts';
 import Logout from './pages/Logout';
 
 /**
- * ルーティングには、React Router(https://reacttraining.com/react-router/web/guides/quick-start) を使用する。
+ * ルーティングには、React Router(https://v5.reactrouter.com/web/guides/quick-start) を使用する。
  * 詳しい使い方についてはドキュメントを参照すること。
  *
  * ルーティングの設定は 本コンポーネント（Routing）に集約する。
- * ログイン状態によって遷移先をコントロールできるように <Route>コンポーネント(https://reacttraining.com/react-router/web/api/Route)をラップしたコンポーネントを使用する。
+ * ログイン状態によって遷移先をコントロールできるように <Route>コンポーネント(https://v5.reactrouter.com/web/api/Route)をラップしたコンポーネントを使用する。
  * ログイン状態にかかわらず参照できるページは、<Route>コンポーネントをそのまま使用する
  */
 const Routing: React.FC = () => {
